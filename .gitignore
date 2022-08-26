@@ -1,0 +1,8 @@
+.vs/
+ApriSiSteam/bin/
+ApriSiSteam/obj/
+bin/
+obj/
+
+# Our own excluded goodies
+token.txt
