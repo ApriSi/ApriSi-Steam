@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -11,9 +13,11 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using ApriSiSteam.Models;
 using ApriSiSteam.Repositories;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Steamworks;
+using Steamworks.Ugc;
 
 namespace ApriSiSteam
 {
@@ -150,13 +154,13 @@ namespace ApriSiSteam
             }
 
             var json = File.ReadAllText(@"Games.json");
-            JObject Games = (JObject)JsonConvert.DeserializeObject(json);
+            List<SteamApp> Games = JsonConvert.DeserializeObject<List<SteamApp>>(json);
 
-            foreach (var game in clientGames)
-            {
-                if (Games.ContainsKey(game.Key.ToString()))
-                    GamesInCommonDisplay.AppendText($"Game: {game.Value}\n");
-            }
+            foreach (var clientGame in clientGames)
+                foreach (var game in Games)
+                    if (game.Appid == clientGame.Key)
+                        if(game.AppCategories.Contains("Online Co-op"))
+                                GamesInCommonDisplay.AppendText($"Game: {clientGame.Value}\n");
 
             CheckGamesButton.IsEnabled = true;
             CheckGamesButton.Content = "Check Games";
@@ -192,13 +196,13 @@ namespace ApriSiSteam
         {
             if (!File.Exists("Games.Json") || forceUpdate)
             {
-                CancellationTokenSource tokenSource = new CancellationTokenSource();
-                Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate { LoadingData(tokenSource.Token); }));
+                //CancellationTokenSource tokenSource = new CancellationTokenSource();
+                //Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate { LoadingData(tokenSource.Token); }));
 
                 var games = await GetOwnedGamesAsync();
 
                 File.WriteAllText(@"Games.json", JsonConvert.SerializeObject(games));
-                tokenSource.Cancel();
+                //tokenSource.Cancel();
             }
 
             // Let it snow, let it snow let, let it snow
@@ -230,27 +234,83 @@ namespace ApriSiSteam
         public async Task<IEnumerable<SteamApp>> GetOwnedGamesAsync()
         {
             var ownedGames = new List<SteamApp>();
-            foreach (var game in OwnedGames)
+            foreach (var clientGame in OwnedGames)
             {
-                ownedGames.Add(await GetSteamApp((int)game.Appid));
+                var game = GetSteamApp((int)clientGame.Appid);
+
+                if (game is not null)
+                    ownedGames.Add(game);
             }
 
             return ownedGames;
         }
 
-        public async Task<SteamApp> GetSteamApp(int appid)
+        public int loadedGames = 0;
+        public SteamApp GetSteamApp(int appid)
         {
-            using var client = new HttpClient();
-
-            var response = await client.GetFromJsonAsync<Dictionary<int, RootApp>>($"https://store.steampowered.com/api/appdetails?appids={appid}&filters=categories").ConfigureAwait(false);
-
-            var steamApp = new SteamApp
+            try
             {
-                Appid = appid,
-                AppCategories = response[appid].Data.Categories
-            };
+                HtmlWeb web = new HtmlWeb();
+                HtmlDocument doc = web.Load($"https://store.steampowered.com/app/{appid}");
 
-            return steamApp;
+                var Categories = doc.DocumentNode.SelectNodes("//a[@class='game_area_details_specs_ctn']");
+                var image = doc.DocumentNode.SelectSingleNode("//img[@class='game_header_image_full']");
+                var Desc = doc.DocumentNode.SelectSingleNode("//div[@class='game_description_snippet']");
+
+                var titles = new List<string>();
+                if(Categories != null)
+                {
+                    foreach (var item in Categories)
+                    {
+                        titles.Add(item.InnerText);                               
+                    }
+
+                    var steamApp = new SteamApp
+                    {
+                        Appid = appid,
+                        AppCategories = titles,
+                        ImgPath = image.Attributes["src"].Value,
+                        Description = Desc.InnerText
+                    };
+
+                    loadedGames++;
+                    Debug.WriteLine(appid + $" - {loadedGames}/{OwnedGames.Count}");
+                    return steamApp;
+                }
+                else
+                {
+                    return null;
+                }
+                
+            }
+            catch
+            {
+                return null; 
+            }
+            
+
+
+            /*using var client = new HttpClient();
+
+            try
+            {
+                var response = await client.GetFromJsonAsync<Dictionary<int, RootApp>>($"https://store.steampowered.com/api/appdetails?appids={appid}&filters=categories").ConfigureAwait(false);
+                if (response[appid].Data == null)
+                    return null;
+                var steamApp = new SteamApp
+                {
+                    Appid = appid,
+                    AppCategories = response[appid].Data.Categories
+                };
+
+                return steamApp;
+            }
+            catch(Exception ex)
+            {
+                Debug.Write(ex);
+                return null;
+            }
+            Thread.Sleep(750); */
         }
 
         private void ExitButton_OnClick(object sender, RoutedEventArgs e)
@@ -268,7 +328,9 @@ namespace ApriSiSteam
 public class SteamApp
 {
     public int Appid { get; set; }
-    public List<AppCategory> AppCategories { get; set; }
+    public List<string>? AppCategories { get; set; }
+    public string ImgPath { get; set; }
+    public string Description { get; set; }
 }
 
 public class RootApp
