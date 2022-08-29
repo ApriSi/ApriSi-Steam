@@ -1,9 +1,6 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
@@ -17,13 +14,11 @@ using ApriSiSteam.Repositories;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Steamworks;
-using Steamworks.ServerList;
 
 namespace ApriSiSteam
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+    /// Ooooh we're half way there, OOOOOOH OOOH SQUIDWARD ON A CHAIR.. TAKE MY HAND AND WE'LL MAKE IT I SWEAR OOOOOOOOH SQUIDWARD ON A CHAIR
+    /// SQUIIIIDWAARD OOON A CHAAIIIR
     public partial class MainWindow : Window
     {
         public static List<Game> OwnedGames = new();
@@ -54,7 +49,7 @@ namespace ApriSiSteam
                 OwnedGames.Add(game);
 
             Friends = SteamFriends.GetFriends().ToList();
-            
+
             UpdateCategories(false);
         }
 
@@ -195,7 +190,19 @@ namespace ApriSiSteam
         string[] categories = { "co-op", "multi-player", "online co-op" };
         private async void UpdateCategories(bool forceUpdate)
         {
-            if (!File.Exists("Games.json") || forceUpdate)
+            if (!File.Exists("Games.Json") || forceUpdate)
+            {
+                CancellationTokenSource tokenSource = new CancellationTokenSource();
+                Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate { LoadingData(tokenSource.Token); }));
+
+                var games = await GetOwnedGamesAsync();
+
+                File.WriteAllText(@"Games.json", JsonConvert.SerializeObject(games));
+                tokenSource.Cancel();
+            }
+
+            // Let it snow, let it snow let, let it snow
+            /*if (!File.Exists("Games.json") || forceUpdate)
             {
                 CancellationTokenSource tokenSource = new CancellationTokenSource();
                 Dispatcher.Invoke(DispatcherPriority.Background, new ThreadStart(delegate { LoadingData(tokenSource.Token); }));
@@ -217,7 +224,33 @@ namespace ApriSiSteam
                 File.WriteAllText(@"Games.json", JsonConvert.SerializeObject(Games));
 
                 tokenSource.Cancel();
+            }*/
+        }
+
+        public async Task<IEnumerable<SteamApp>> GetOwnedGamesAsync()
+        {
+            var ownedGames = new List<SteamApp>();
+            foreach (var game in OwnedGames)
+            {
+                ownedGames.Add(await GetSteamApp((int)game.Appid));
             }
+
+            return ownedGames;
+        }
+
+        public async Task<SteamApp> GetSteamApp(int appid)
+        {
+            using var client = new HttpClient();
+
+            var response = await client.GetFromJsonAsync<Dictionary<int, RootApp>>($"https://store.steampowered.com/api/appdetails?appids={appid}&filters=categories").ConfigureAwait(false);
+
+            var steamApp = new SteamApp
+            {
+                Appid = appid,
+                AppCategories = response[appid].Data.Categories
+            };
+
+            return steamApp;
         }
 
         private void ExitButton_OnClick(object sender, RoutedEventArgs e)
@@ -230,6 +263,12 @@ namespace ApriSiSteam
             WindowState = WindowState.Minimized;
         }
     }
+}
+
+public class SteamApp
+{
+    public int Appid { get; set; }
+    public List<AppCategory> AppCategories { get; set; }
 }
 
 public class RootApp
