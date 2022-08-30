@@ -313,6 +313,9 @@ namespace ApriSiSteam
         {
             UsernameDisplay.Text = SteamClient.Name;
             GameCountDisplay.Text = "Games Owned: " + OwnedGames.Count;
+
+            var userSummaries = await OwnedGamesRepository.GetUserSummaries(SteamClient.SteamId);
+            ProfileImage.Source = new BitmapImage(new Uri(userSummaries.Avatarfull));
         }
     }
 }
