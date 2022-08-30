@@ -111,13 +111,15 @@
 
             <Grid x:Name="GameWindow"
                   Grid.Column="2">
-                <ItemsControl x:Name="GameList"
-                              Background="#082032"
-                              Height="530"
-                              Width="460"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Top"
-                              Margin="0,15,10,0"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl x:Name="GameList"
+                                  Background="#082032"
+                                  Height="530"
+                                  Width="460"
+                                  HorizontalAlignment="Right"
+                                  VerticalAlignment="Top"
+                                  Margin="0,15,10,0"/>
+                </ScrollViewer>
                 <Button x:Name="CheckGamesButton"
                         Background="#3ae374"
                         Height="45"
