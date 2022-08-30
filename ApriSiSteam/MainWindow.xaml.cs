@@ -24,6 +24,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Steamworks;
 using Steamworks.Ugc;
+using static System.Net.Mime.MediaTypeNames;
 using Brushes = System.Windows.Media.Brushes;
 
 namespace ApriSiSteam
@@ -61,7 +62,10 @@ namespace ApriSiSteam
 
             Friends = SteamFriends.GetFriends().ToList();
 
-            UpdateCategories(false);
+            var UpdateCategoryThread = new Thread(() => UpdateCategories(false));
+            UpdateCategoryThread.Start();
+
+            //await UpdateCategories(false);
             LoadProfileInformation();
         }
 
@@ -187,12 +191,21 @@ namespace ApriSiSteam
         string[] categories = { "co-op", "multi-player", "online co-op" };
         private async void UpdateCategories(bool forceUpdate)
         {
+            Dispatcher.Invoke(() =>
+            {
+                LoadingPanel.Visibility = Visibility.Visible;
+            });
             if (!File.Exists("Games.Json") || forceUpdate)
             {
                 var games = await GetOwnedGamesAsync();
 
                 File.WriteAllText(@"Games.json", JsonConvert.SerializeObject(games));
             }
+
+            Dispatcher.Invoke(() =>
+            {
+                LoadingPanel.Visibility = Visibility.Hidden;
+            });
         }
 
         public async Task<IEnumerable<SteamApp>> GetOwnedGamesAsync()
@@ -267,6 +280,10 @@ namespace ApriSiSteam
 
                     loadedGames++;
                     Debug.WriteLine(appid + $" - {loadedGames}/{OwnedGames.Count}");
+                    Dispatcher.Invoke(() =>
+                    {
+                        LoadingDisplay.Text = $"{loadedGames}/{OwnedGames.Count}";
+                    });
                     return steamApp;
                 }
                 else
@@ -280,8 +297,6 @@ namespace ApriSiSteam
                 return null;
             }
         }
-
-
 
         private void ExitButton_OnClick(object sender, RoutedEventArgs e)
         {
