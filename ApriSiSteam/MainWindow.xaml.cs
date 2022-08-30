@@ -34,6 +34,7 @@ namespace ApriSiSteam
     public partial class MainWindow : Window
     {
         public static List<Game> OwnedGames = new();
+        public List<SteamApp> SteamApps = new();
 
         public static List<Friend>? Friends;
         public static List<Friend> SelectedFriends = new List<Friend>();
@@ -56,74 +57,35 @@ namespace ApriSiSteam
         {
             var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
 
+            Debug.WriteLine(Environment.ProcessorCount / 2);
             if (clientUserGames.Games is null) return;
             foreach (var game in clientUserGames.Games.ToList())
                 OwnedGames.Add(game);
 
             Friends = SteamFriends.GetFriends().ToList();
 
-            var UpdateCategoryThread = new Thread(() => UpdateCategories(false));
-            UpdateCategoryThread.Start();
+            int devidedCount = (int)clientUserGames.Game_count! / Environment.ProcessorCount / 2;
+            var ThreadGamecount = new List<int>();
+
+            for (int i = 0; i < Environment.ProcessorCount / 2; i++)
+            {
+                ThreadGamecount.Add(devidedCount * i);
+            }
+            ThreadGamecount.Add((int)clientUserGames.Game_count);
+
+
+            for (int i = 0; i < ThreadGamecount.Count - 1; i++)
+            {
+                var tis = ThreadGamecount[i];
+                var tis2 = ThreadGamecount[i + 1];
+
+                var UpdateCategoryThread = new Thread(() => UpdateCategories(false, tis, tis2));
+                UpdateCategoryThread.Start();
+            }       
 
             //await UpdateCategories(false);
             LoadProfileInformation();
         }
-
-        private void FriendlistLoaded(object sender, RoutedEventArgs e)
-        {
-            foreach (var friend in SteamFriends.GetFriends())
-            {
-                var friendCheckBox = new CheckBox()
-                {
-                    Content = friend.Name,
-                    DataContext = friend,
-                    Foreground = new SolidColorBrush(Colors.White)
-                };
-
-                friendCheckBox.Checked += FriendCheckBox_Checked;
-                friendCheckBox.Unchecked += FriendCheckBox_Unchecked;
-
-                FriendList.Items.Add(friendCheckBox);
-            }
-        }
-
-        private void FriendCheckBox_Unchecked(object sender, RoutedEventArgs e)
-        {
-            var checkBox = sender as CheckBox;
-
-            if (checkBox is null) return;
-            var friend = (Friend)checkBox.DataContext;
-            SelectedFriends.Remove(friend);
-
-            DisplaySelectedUsers();
-        }
-
-        private void FriendCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            var checkBox = (CheckBox)sender;
-            if (SelectedFriends.Count > 10)
-            {
-                checkBox.IsChecked = false;
-                return;
-            }
-
-            if (checkBox is null) return;
-            var friend = (Friend)checkBox.DataContext;
-            SelectedFriends.Add(friend);
-
-            DisplaySelectedUsers();
-        }
-
-        private void DisplaySelectedUsers()
-        {
-            FriendNameDisplay.Text = string.Empty;
-            foreach (var friend in SelectedFriends)
-            {
-                FriendNameDisplay.Text += $"Name: {friend.Name}\nId: {friend.Id}\n";
-            }
-        }
-
-        private void TopOverlay_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => DragMove();
 
         private async void CheckGamesButton_Click(object sender, RoutedEventArgs e)
         {
@@ -171,17 +133,17 @@ namespace ApriSiSteam
             foreach (var clientGame in clientGames)
                 foreach (var game in Games)
                     if (game.Appid == clientGame.Key)
-                        if(game.AppCategories.Contains("Online Co-op") || game.UserDefinedCategories.Contains("Co-op"))
+                        if (game.AppCategories.Contains("Online Co-op") || game.UserDefinedCategories.Contains("Co-op"))
                         {
                             var steamAppControl = new SteamAppControl();
                             steamAppControl.NameDisplay.Text = clientGame.Value;
-                            
+
                             var bitmapImage = new BitmapImage(new Uri(game.ImgPath));
                             steamAppControl.GameBanner.Source = bitmapImage;
 
                             GameList.Items.Add(steamAppControl);
                         }
-                                
+
 
             CheckGamesButton.IsEnabled = true;
             CheckGamesButton.Content = "Check Games";
@@ -189,7 +151,7 @@ namespace ApriSiSteam
         }
 
         string[] categories = { "co-op", "multi-player", "online co-op" };
-        private async void UpdateCategories(bool forceUpdate)
+        private async void UpdateCategories(bool forceUpdate, int startCount, int endCount)
         {
             Dispatcher.Invoke(() =>
             {
@@ -197,30 +159,32 @@ namespace ApriSiSteam
             });
             if (!File.Exists("Games.Json") || forceUpdate)
             {
-                var games = await GetOwnedGamesAsync();
+                GetOwnedGamesAsync(startCount, endCount);
 
-                File.WriteAllText(@"Games.json", JsonConvert.SerializeObject(games));
+                if(endCount == OwnedGames.Count)
+                {
+                    File.WriteAllText(@"Games.json", JsonConvert.SerializeObject(SteamApps));
+                    Dispatcher.Invoke(() =>
+                    {
+                        LoadingPanel.Visibility = Visibility.Hidden;
+                    });
+                }
             }
 
-            Dispatcher.Invoke(() =>
-            {
-                LoadingPanel.Visibility = Visibility.Hidden;
-            });
+            
         }
 
-        public async Task<IEnumerable<SteamApp>> GetOwnedGamesAsync()
+        public async void GetOwnedGamesAsync(int startCount, int endCount)
         {
             var ownedGames = new List<SteamApp>();
-            
-            foreach (var clientGame in OwnedGames)
+
+            for (int i = startCount; i < endCount; i++)
             {
-                var game = await GetSteamApp((int)clientGame.Appid);
+                var game = await GetSteamApp((int)OwnedGames[i].Appid);
 
                 if (game is not null)
-                    ownedGames.Add(game);
+                    SteamApps.Add(game);
             }
-
-            return ownedGames;
         }
 
         public int loadedGames = 0;
@@ -318,6 +282,63 @@ namespace ApriSiSteam
             var userSummaries = await OwnedGamesRepository.GetUserSummaries(SteamClient.SteamId);
             ProfileImage.Source = new BitmapImage(new Uri(userSummaries.Avatarfull));
         }
+
+        private void FriendlistLoaded(object sender, RoutedEventArgs e)
+        {
+            foreach (var friend in SteamFriends.GetFriends())
+            {
+                var friendCheckBox = new CheckBox()
+                {
+                    Content = friend.Name,
+                    DataContext = friend,
+                    Foreground = new SolidColorBrush(Colors.White)
+                };
+
+                friendCheckBox.Checked += FriendCheckBox_Checked;
+                friendCheckBox.Unchecked += FriendCheckBox_Unchecked;
+
+                FriendList.Items.Add(friendCheckBox);
+            }
+        }
+
+        private void FriendCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+
+            if (checkBox is null) return;
+            var friend = (Friend)checkBox.DataContext;
+            SelectedFriends.Remove(friend);
+
+            DisplaySelectedUsers();
+        }
+
+        private void FriendCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            var checkBox = (CheckBox)sender;
+            if (SelectedFriends.Count > 10)
+            {
+                checkBox.IsChecked = false;
+                return;
+            }
+
+            if (checkBox is null) return;
+            var friend = (Friend)checkBox.DataContext;
+            SelectedFriends.Add(friend);
+
+            DisplaySelectedUsers();
+        }
+
+        private void DisplaySelectedUsers()
+        {
+            FriendNameDisplay.Text = string.Empty;
+            foreach (var friend in SelectedFriends)
+            {
+                FriendNameDisplay.Text += $"Name: {friend.Name}\nId: {friend.Id}\n";
+            }
+        }
+
+        private void TopOverlay_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => DragMove();
+
     }
 }
 
