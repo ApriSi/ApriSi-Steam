@@ -98,7 +98,19 @@
                               Height="530"
                               Width="184"
                               VerticalAlignment="Top"
-                              Margin="-115,15,0,0"/>
+                              Margin="-115,15,0,0">
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Background="#082032">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                </ItemsControl>
+                
                 <TextBlock x:Name="FriendNameDisplay"
                            Background="#082032"
                            Foreground="White"
@@ -111,16 +123,26 @@
 
             <Grid x:Name="GameWindow"
                   Grid.Column="2">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <ItemsControl x:Name="GameList"
-                                  Background="#082032"
-                                  Height="530"
-                                  Width="460"
-                                  HorizontalAlignment="Right"
-                                  VerticalAlignment="Top"
-                                  Margin="0,15,10,0"/>
-                </ScrollViewer>
-                <Button x:Name="CheckGamesButton"
+                                      Background="#082032"
+                                      Height="530"
+                                      Width="460"
+                                      HorizontalAlignment="Right"
+                                      VerticalAlignment="Top"
+                                      Margin="0,15,10,0">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Background="#082032">
+                                <ItemsPresenter />
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
+
+                    <Button x:Name="CheckGamesButton"
                         Background="#3ae374"
                         Height="45"
                         Width="325"

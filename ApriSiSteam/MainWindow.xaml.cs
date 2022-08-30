@@ -300,6 +300,7 @@ namespace ApriSiSteam
 
         private void ExitButton_OnClick(object sender, RoutedEventArgs e)
         {
+            Environment.Exit(Environment.ExitCode);
             Close();
         }
 
