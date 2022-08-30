@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="ApriSiSteam.SteamAppControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ApriSiSteam"
+             mc:Ignorable="d" 
+             d:DesignHeight="90" d:DesignWidth="300">
+    <Grid Background="#334756">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="129"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <TextBlock x:Name="NameDisplay"
+                           Text="GAME NAME"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Foreground="White"
+                           FontWeight="Black"
+                           FontSize="20"/>
+            </Grid>
+
+
+        </Grid>
+        
+        <Grid Grid.Column="1">
+            <Image x:Name="GameBanner"
+                   Source="https://cdn.cloudflare.steamstatic.com/steam/apps/22650/header.jpg?t=1655730776"
+                   Width="auto"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Right"/>
+        </Grid>
+    </Grid>
+</UserControl>
