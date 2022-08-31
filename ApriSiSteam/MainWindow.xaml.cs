@@ -55,52 +55,7 @@ namespace ApriSiSteam
 
         private async void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            /*var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
 
-            Debug.WriteLine(Environment.ProcessorCount / 2);
-            if (clientUserGames.Games is null) return;
-            foreach (var game in clientUserGames.Games.ToList())
-                OwnedGames.Add(game);
-
-            Friends = SteamFriends.GetFriends().ToList();
-
-            int devidedCount = (int)clientUserGames.Game_count! / Environment.ProcessorCount / 2;
-            var ThreadGamecount = new List<int>();
-
-            //await UpdateCategories(false);
-            LoadProfileInformation();
-        }
-
-        private void FriendlistLoaded(object sender, RoutedEventArgs e)
-        {
-            foreach (var friend in SteamFriends.GetFriends())
-            {
-                var friendCheckBox = new CheckBox()
-                {
-                    Content = friend.Name,
-                    DataContext = friend,
-                    Foreground = new SolidColorBrush(Colors.White)
-                };
-
-                friendCheckBox.Checked += FriendCheckBox_Checked;
-                friendCheckBox.Unchecked += FriendCheckBox_Unchecked;
-
-                FriendList.Items.Add(friendCheckBox);
-            }
-            ThreadGamecount.Add((int)clientUserGames.Game_count);
-
-
-            for (int i = 0; i < ThreadGamecount.Count - 1; i++)
-            {
-                var tis = ThreadGamecount[i];
-                var tis2 = ThreadGamecount[i + 1];
-
-                var UpdateCategoryThread = new Thread(() => UpdateCategories(false, tis, tis2));
-                UpdateCategoryThread.Start();
-            }       
-
-            //await UpdateCategories(false);
-            LoadProfileInformation();
         }
 
         private async void CheckGamesButton_Click(object sender, RoutedEventArgs e)
@@ -126,7 +81,6 @@ namespace ApriSiSteam
             foreach (var friend in SelectedFriends)
             {
                 var friendOwnedGames = await OwnedGamesRepository.GetOwnedGamesAsync(friend.Id);
-                if (friendOwnedGames is null) return;
                 if (friendOwnedGames.Games is null) return;
                 friendGames.Add(friend.Id, new Dictionary<int, string>());
                 var games = friendOwnedGames.Games.ToList();
@@ -178,7 +132,7 @@ namespace ApriSiSteam
             {
                 GetOwnedGamesAsync(startCount, endCount);
 
-                if(endCount == OwnedGames.Count)
+                if (endCount == OwnedGames.Count)
                 {
                     File.WriteAllText(@"Games.json", JsonConvert.SerializeObject(SteamApps));
                     Dispatcher.Invoke(() =>
@@ -188,7 +142,7 @@ namespace ApriSiSteam
                 }
             }
 
-            
+
         }
 
         public async void GetOwnedGamesAsync(int startCount, int endCount)
@@ -356,6 +310,64 @@ namespace ApriSiSteam
 
         private void TopOverlay_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => DragMove();
 
+        private void SteamAPIButton_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://steamcommunity.com/dev",
+                UseShellExecute = true
+            });
+        }
+
+        private void ApplyKey_Click(object sender, RoutedEventArgs e)
+        {
+            Token.SetKey(TokenInput.Password);
+            File.WriteAllText("SteamToken.key", TokenInput.Password);
+            TokenPanel.Visibility = Visibility.Hidden;
+            LoadSteamData();
+        }
+
+        public async void LoadSteamData()
+        {
+            var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
+
+            Debug.WriteLine(Environment.ProcessorCount / 2);
+            if (clientUserGames.Games is null) return;
+            foreach (var game in clientUserGames.Games.ToList())
+                OwnedGames.Add(game);
+
+            Friends = SteamFriends.GetFriends().ToList();
+
+            int devidedCount = (int)clientUserGames.Game_count! / Environment.ProcessorCount / 2;
+            var ThreadGamecount = new List<int>();
+
+            for (int i = 0; i < Environment.ProcessorCount / 2; i++)
+            {
+                ThreadGamecount.Add(devidedCount * i);
+            }
+            ThreadGamecount.Add((int)clientUserGames.Game_count);
+
+
+            for (int i = 0; i < ThreadGamecount.Count - 1; i++)
+            {
+                var tis = ThreadGamecount[i];
+                var tis2 = ThreadGamecount[i + 1];
+
+                var UpdateCategoryThread = new Thread(() => UpdateCategories(false, tis, tis2));
+                UpdateCategoryThread.Start();
+            }
+
+            LoadProfileInformation();
+        }
+
+        private void TokenPanel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!File.Exists("SteamToken.key")) return;
+            TokenPanel.Visibility = Visibility.Hidden;
+
+            Token.SetKey(File.ReadAllText("SteamToken.key"));
+            LoadSteamData();
+        }
     }
 }
 

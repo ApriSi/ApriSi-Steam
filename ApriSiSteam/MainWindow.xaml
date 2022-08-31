@@ -182,7 +182,8 @@
         
         <Grid x:Name="TokenPanel"
               Grid.Row="1"
-              Background="#353b48">
+              Background="#353b48"
+              Loaded="TokenPanel_Loaded">
 
             <TextBlock Text="Steam API Token"
                        Foreground="White"
