@@ -124,12 +124,13 @@ namespace ApriSiSteam
         string[] categories = { "co-op", "multi-player", "online co-op" };
         private async void UpdateCategories(bool forceUpdate, int startCount, int endCount)
         {
-            Dispatcher.Invoke(() =>
-            {
-                LoadingPanel.Visibility = Visibility.Visible;
-            });
+           
             if (!File.Exists("Games.Json") || forceUpdate)
             {
+                Dispatcher.Invoke(() =>
+                {
+                    LoadingPanel.Visibility = Visibility.Visible;
+                });
                 GetOwnedGamesAsync(startCount, endCount);
 
                 if (endCount == OwnedGames.Count)
@@ -331,17 +332,16 @@ namespace ApriSiSteam
         {
             var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
 
-            Debug.WriteLine(Environment.ProcessorCount / 2);
             if (clientUserGames.Games is null) return;
             foreach (var game in clientUserGames.Games.ToList())
                 OwnedGames.Add(game);
 
             Friends = SteamFriends.GetFriends().ToList();
 
-            int devidedCount = (int)clientUserGames.Game_count! / Environment.ProcessorCount / 2;
+            int devidedCount = (int)clientUserGames.Game_count! / 2;
             var ThreadGamecount = new List<int>();
 
-            for (int i = 0; i < Environment.ProcessorCount / 2; i++)
+            for (int i = 0; i < 2; i++)
             {
                 ThreadGamecount.Add(devidedCount * i);
             }
