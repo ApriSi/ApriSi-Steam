@@ -54,7 +54,7 @@ namespace ApriSiSteam
 
         private async void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
+            /*var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
 
             if (clientUserGames.Games is null) return;
             foreach (var game in clientUserGames.Games.ToList())
@@ -66,7 +66,7 @@ namespace ApriSiSteam
             UpdateCategoryThread.Start();
 
             //await UpdateCategories(false);
-            LoadProfileInformation();
+            LoadProfileInformation();*/
         }
 
         private void FriendlistLoaded(object sender, RoutedEventArgs e)
@@ -148,6 +148,7 @@ namespace ApriSiSteam
             foreach (var friend in SelectedFriends)
             {
                 var friendOwnedGames = await OwnedGamesRepository.GetOwnedGamesAsync(friend.Id);
+                if (friendOwnedGames is null) return;
                 if (friendOwnedGames.Games is null) return;
                 friendGames.Add(friend.Id, new Dictionary<int, string>());
                 var games = friendOwnedGames.Games.ToList();
@@ -317,6 +318,34 @@ namespace ApriSiSteam
 
             var userSummaries = await OwnedGamesRepository.GetUserSummaries(SteamClient.SteamId);
             ProfileImage.Source = new BitmapImage(new Uri(userSummaries.Avatarfull));
+        }
+
+        private async void ApplyKey_Click(object sender, RoutedEventArgs e)
+        {
+            Token.SetKey(TokenInput.Password);
+            TokenPanel.Visibility = Visibility.Hidden;
+            
+            var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
+
+            if (clientUserGames.Games is null) return;
+            foreach (var game in clientUserGames.Games.ToList())
+                OwnedGames.Add(game);
+
+            Friends = SteamFriends.GetFriends().ToList();
+
+            var UpdateCategoryThread = new Thread(() => UpdateCategories(false));
+            UpdateCategoryThread.Start();
+
+            LoadProfileInformation();
+        }
+
+        private void SteamAPIButton_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://steamcommunity.com/dev",
+                UseShellExecute = true
+            });
         }
     }
 }

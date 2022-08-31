@@ -1,9 +1,18 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Windows.Input;
 
 namespace ApriSiSteam
 {
     public static class Token
     {
-        public static string GetKey() => File.ReadAllText("token.txt");
+        private static string _key { get; set; }
+
+        public static string GetKey() => _key;
+
+        internal static void SetKey(string password)
+        {
+            _key = password;
+        }
     }
 }

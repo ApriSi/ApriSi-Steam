@@ -67,6 +67,8 @@
                         <RowDefinition Height="200"/>
                         <RowDefinition/>
                         <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition Height="35"/>
                     </Grid.RowDefinitions>
                     <Image x:Name="ProfileImage"
                            Grid.Row="0"
@@ -82,7 +84,7 @@
                                Foreground="White"/>
 
                     <TextBlock x:Name="GameCountDisplay"
-                               Grid.Row="3"
+                               Grid.Row="2"
                                Text="Games: 350+"
                                FontWeight="Bold"
                                FontSize="15"
@@ -159,7 +161,7 @@
         <Grid x:Name="LoadingPanel"
               Grid.Row="1"
               Background="#353b48"
-              Visibility="Visible">
+              Visibility="Hidden">
             <TextBlock
                        Text="Loading Games"
                        Foreground="White"
@@ -176,6 +178,55 @@
                        VerticalAlignment="Center"
                        TextAlignment="Center"
                        Margin="0,200,0,0"/>
+        </Grid>
+        
+        <Grid x:Name="TokenPanel"
+              Grid.Row="1"
+              Background="#353b48">
+
+            <TextBlock Text="Steam API Token"
+                       Foreground="White"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="50"
+                       Margin="0,0,0,35"/>
+            
+            <TextBlock x:Name="SteamAPIButton"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Text="Get Token Here"
+                    Height="20"
+                    Width="350"
+                    Background="Transparent"
+                    Foreground="#3498db"
+                    FontWeight="Bold"
+                    TextDecorations="Underline"
+                    TextAlignment="Center"
+                    Margin="0,45,0,0"
+                    MouseDown="SteamAPIButton_MouseDown"
+                    Cursor="Hand"/>
+
+            <PasswordBox x:Name="TokenInput"
+                         Height="40"
+                         Width="350"
+                         Margin="0,125,0,0"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         BorderThickness="0"/>
+
+            <Button x:Name="ApplyKey"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Content="Confirm"
+                    Height="20"
+                    Width="350"
+                    Click="ApplyKey_Click"
+                    Background="#3ae374"
+                    BorderThickness="0"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Margin="0,200,0,0"/>
         </Grid>
     </Grid>
 
