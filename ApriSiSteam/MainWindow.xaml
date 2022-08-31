@@ -59,6 +59,10 @@
             </Grid.ColumnDefinitions>
 
             <Grid x:Name="ProfileWindow">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
                 <Grid VerticalAlignment="Top"
                       HorizontalAlignment="Left"
                       Margin="15,15,0,0">
@@ -89,6 +93,34 @@
                                FontWeight="Bold"
                                FontSize="15"
                                Foreground="White"/>
+                </Grid>
+                <Grid x:Name="CategoryPanel"
+                      Grid.Row="1">
+                    <TextBlock Text="Steam Tags"
+                               Foreground="White"
+                               FontWeight="Bold"
+                               Margin="15,0,0,0"
+                               VerticalAlignment="Top"
+                               Height="25"/>
+                    
+                    <ItemsControl x:Name="CategoryList"
+                              Loaded="CategoryList_Loaded"
+                              Background="#082032"
+                              Height="290"
+                              Width="200"
+                              VerticalAlignment="Top"
+                              Margin="-25,18,0,0">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Background="#082032">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
                 </Grid>
             </Grid>
 
@@ -183,7 +215,8 @@
         <Grid x:Name="TokenPanel"
               Grid.Row="1"
               Background="#353b48"
-              Loaded="TokenPanel_Loaded">
+              Loaded="TokenPanel_Loaded"
+              Visibility="Hidden">
 
             <TextBlock Text="Steam API Token"
                        Foreground="White"

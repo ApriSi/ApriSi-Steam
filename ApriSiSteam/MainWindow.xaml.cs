@@ -368,6 +368,11 @@ namespace ApriSiSteam
             Token.SetKey(File.ReadAllText("SteamToken.key"));
             LoadSteamData();
         }
+
+        private void CategoryList_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
 
