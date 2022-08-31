@@ -55,7 +55,7 @@ namespace ApriSiSteam
 
         private async void WindowLoaded(object sender, RoutedEventArgs e)
         {
-
+            LoadSteamData();
         }
 
         private async void CheckGamesButton_Click(object sender, RoutedEventArgs e)
@@ -80,10 +80,10 @@ namespace ApriSiSteam
 
             foreach (var friend in SelectedFriends)
             {
-                var friendOwnedGames = await OwnedGamesRepository.GetOwnedGamesAsync(friend.Id);
-                if (friendOwnedGames.Games is null) return;
+                var friendOwnedGames = OwnedGamesRepository.GetOwnedGames(friend.Id);
+                if (friendOwnedGames is null) return;
                 friendGames.Add(friend.Id, new Dictionary<int, string>());
-                var games = friendOwnedGames.Games.ToList();
+                var games = friendOwnedGames;
                 foreach (var game in games)
                     foreach (var clientGame in OwnedGames)
                         if (game.Name == clientGame.Name && !friendGames[friend.Id].ContainsKey((int)game.Appid!))
@@ -246,13 +246,20 @@ namespace ApriSiSteam
         }
 
 
-        private async void LoadProfileInformation()
+        private void LoadProfileInformation()
         {
             UsernameDisplay.Text = SteamClient.Name;
             GameCountDisplay.Text = "Games Owned: " + OwnedGames.Count;
 
-            var userSummaries = await OwnedGamesRepository.GetUserSummaries(SteamClient.SteamId);
-            ProfileImage.Source = new BitmapImage(new Uri(userSummaries.Avatarfull));
+            HtmlWeb web = new HtmlWeb();
+            using var client = new HttpClient();
+            web.UserAgent = "Mozilla/5.0 (X11; CrOS x86_64 14816.131.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
+
+            Uri uri = new Uri($"https://steamdb.info/calculator/{SteamClient.SteamId}/?cc=eu");
+            HtmlDocument doc = web.Load(uri);
+
+            var profileImage = doc.DocumentNode.SelectSingleNode("//img[@class='avatar']");
+            ProfileImage.Source = new BitmapImage(new Uri(profileImage.Attributes["src"].Value));
         }
 
         private void FriendlistLoaded(object sender, RoutedEventArgs e)
@@ -320,32 +327,24 @@ namespace ApriSiSteam
             });
         }
 
-        private void ApplyKey_Click(object sender, RoutedEventArgs e)
+        public void LoadSteamData()
         {
-            Token.SetKey(TokenInput.Password);
-            File.WriteAllText("SteamToken.key", TokenInput.Password);
-            TokenPanel.Visibility = Visibility.Hidden;
-            LoadSteamData();
-        }
+            var clientUserGames = OwnedGamesRepository.GetOwnedGames(SteamClient.SteamId);
 
-        public async void LoadSteamData()
-        {
-            var clientUserGames = await OwnedGamesRepository.GetOwnedGamesAsync(SteamClient.SteamId);
-
-            if (clientUserGames.Games is null) return;
-            foreach (var game in clientUserGames.Games.ToList())
+            if (clientUserGames is null) return;
+            foreach (var game in clientUserGames)
                 OwnedGames.Add(game);
 
             Friends = SteamFriends.GetFriends().ToList();
 
-            int devidedCount = (int)clientUserGames.Game_count! / 2;
+            int devidedCount = (int)clientUserGames.Count! / 2;
             var ThreadGamecount = new List<int>();
 
             for (int i = 0; i < 2; i++)
             {
                 ThreadGamecount.Add(devidedCount * i);
             }
-            ThreadGamecount.Add((int)clientUserGames.Game_count);
+            ThreadGamecount.Add((int)clientUserGames.Count);
 
 
             for (int i = 0; i < ThreadGamecount.Count - 1; i++)
@@ -360,44 +359,9 @@ namespace ApriSiSteam
             LoadProfileInformation();
         }
 
-        private void TokenPanel_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!File.Exists("SteamToken.key")) return;
-            TokenPanel.Visibility = Visibility.Hidden;
-
-            Token.SetKey(File.ReadAllText("SteamToken.key"));
-            LoadSteamData();
-        }
-
         private void CategoryList_Loaded(object sender, RoutedEventArgs e)
         {
 
         }
     }
-}
-
-public class SteamApp
-{
-    public int Appid { get; set; }
-    public List<string>? AppCategories { get; set; }
-    public List<string>? UserDefinedCategories { get; set; }
-    public string ImgPath { get; set; }
-    public string Description { get; set; }
-}
-
-public class RootApp
-{
-    public bool? Success { get; set; }
-    public AppDetails? Data { get; set; }
-}
-
-public class AppDetails
-{
-    public List<AppCategory>? Categories { get; set; }
-}
-
-public class AppCategory
-{
-    public int? Id { get; set; }
-    public string? Description { get; set; }
 }

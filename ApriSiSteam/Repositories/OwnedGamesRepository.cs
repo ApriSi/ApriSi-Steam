@@ -1,52 +1,44 @@
 ﻿using ApriSiSteam.Models;
-using Newtonsoft.Json.Linq;
+using HtmlAgilityPack;
 using Steamworks;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 
 namespace ApriSiSteam.Repositories
 {
     public class OwnedGamesRepository
     {
-        public static async Task<OwnedGames> GetOwnedGamesAsync(SteamId steamUserId)
+        public static List<Game> GetOwnedGames(SteamId steamUserId)
         {
-            try
-            {
-                using var client = new HttpClient();
-                var response = await client.GetFromJsonAsync<Dictionary<string, OwnedGames>>($"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={Token.GetKey()}&steamid={steamUserId}&include_appinfo=true");
-                
-                return response["response"];
-            } catch
-            {
-                Debug.WriteLine("Invalid Token");
-            }
-            return null;
-        }
+            HtmlWeb web = new HtmlWeb();
+            using var client = new HttpClient();
+            web.UserAgent = "Mozilla/5.0 (X11; CrOS x86_64 14816.131.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
 
-        public static async Task<SteamUserSummaries> GetUserSummaries(SteamId steamUserId)
-        {
-            try
-            {
-                using var client = new HttpClient();
-                var response = await client.GetFromJsonAsync<JsonObject>($"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={Token.GetKey()}&steamids={steamUserId}");
+            Uri uri = new Uri($"https://steamdb.info/calculator/{steamUserId}/?cc=eu");
+            HtmlDocument doc = web.Load(uri);
 
-                var steamUserSummaries = new SteamUserSummaries()
+            var apps = doc.DocumentNode.SelectNodes("//tr[@class='app']");
+
+            var ownedGames = new List<Game>();
+            foreach (var app in apps)
+            {
+                var appid = int.Parse(app.Attributes["data-appid"].Value);
+
+                var name = app.SelectSingleNode("td[@class='text-left']").SelectSingleNode("a").InnerText;
+
+                var steamApp = new Game()
                 {
-                    Avatarfull = response["response"]["players"][0]["avatarfull"].ToString()
+                    Appid = appid,
+                    Name = name,
+                    ImagePath = $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/header.jpg"
                 };
 
-                return steamUserSummaries;
-            } catch
-            {
-                Debug.WriteLine("Invalid Token");
+
+                ownedGames.Add(steamApp);
             }
 
-            return null;
+            return ownedGames;
         }
     }
 }

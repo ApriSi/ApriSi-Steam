@@ -102,7 +102,7 @@
                                Margin="15,0,0,0"
                                VerticalAlignment="Top"
                                Height="25"/>
-                    
+
                     <ItemsControl x:Name="CategoryList"
                               Loaded="CategoryList_Loaded"
                               Background="#082032"
@@ -144,7 +144,7 @@
                         </ControlTemplate>
                     </ItemsControl.Template>
                 </ItemsControl>
-                
+
                 <TextBlock x:Name="FriendNameDisplay"
                            Background="#082032"
                            Foreground="White"
@@ -157,26 +157,26 @@
 
             <Grid x:Name="GameWindow"
                   Grid.Column="2">
-                    <ItemsControl x:Name="GameList"
+                <ItemsControl x:Name="GameList"
                                       Background="#082032"
                                       Height="530"
                                       Width="460"
                                       HorizontalAlignment="Right"
                                       VerticalAlignment="Top"
                                       Margin="0,15,10,0">
-                        <ItemsControl.Template>
-                            <ControlTemplate>
+                    <ItemsControl.Template>
+                        <ControlTemplate>
                             <ScrollViewer x:Name="ScrollViewer" 
                                           Padding="{TemplateBinding Padding}"
                                           VerticalScrollBarVisibility="Auto"
                                           Background="#082032">
                                 <ItemsPresenter />
-                                </ScrollViewer>
-                            </ControlTemplate>
-                        </ItemsControl.Template>
-                    </ItemsControl>
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                </ItemsControl>
 
-                    <Button x:Name="CheckGamesButton"
+                <Button x:Name="CheckGamesButton"
                         Background="#3ae374"
                         Height="45"
                         Width="325"
@@ -189,7 +189,7 @@
                         Click="CheckGamesButton_Click"/>
             </Grid>
         </Grid>
-        
+
         <Grid x:Name="LoadingPanel"
               Grid.Row="1"
               Background="#353b48"
@@ -211,57 +211,5 @@
                        TextAlignment="Center"
                        Margin="0,200,0,0"/>
         </Grid>
-        
-        <Grid x:Name="TokenPanel"
-              Grid.Row="1"
-              Background="#353b48"
-              Loaded="TokenPanel_Loaded"
-              Visibility="Hidden">
-
-            <TextBlock Text="Steam API Token"
-                       Foreground="White"
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center"
-                       FontSize="50"
-                       Margin="0,0,0,35"/>
-            
-            <TextBlock x:Name="SteamAPIButton"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Text="Get Token Here"
-                    Height="20"
-                    Width="350"
-                    Background="Transparent"
-                    Foreground="#3498db"
-                    FontWeight="Bold"
-                    TextDecorations="Underline"
-                    TextAlignment="Center"
-                    Margin="0,45,0,0"
-                    MouseDown="SteamAPIButton_MouseDown"
-                    Cursor="Hand"/>
-
-            <PasswordBox x:Name="TokenInput"
-                         Height="40"
-                         Width="350"
-                         Margin="0,125,0,0"
-                         HorizontalAlignment="Center"
-                         VerticalAlignment="Center"
-                         BorderThickness="0"/>
-
-            <Button x:Name="ApplyKey"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Content="Confirm"
-                    Height="20"
-                    Width="350"
-                    Click="ApplyKey_Click"
-                    Background="#3ae374"
-                    BorderThickness="0"
-                    Foreground="White"
-                    FontWeight="Bold"
-                    Margin="0,200,0,0"/>
-        </Grid>
     </Grid>
-
 </Window>
