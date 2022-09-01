@@ -21,7 +21,7 @@ using Brushes = System.Windows.Media.Brushes;
 
 namespace ApriSiSteam
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public static readonly List<Game> OwnedGames = new();
         public readonly List<SteamApp> SteamApps = new();
