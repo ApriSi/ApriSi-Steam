@@ -21,7 +21,7 @@ using Brushes = System.Windows.Media.Brushes;
 
 namespace ApriSiSteam
 {
-    public partial class MainWindow
+    public partial class MainWindow : Window
     {
         public static readonly List<Game> OwnedGames = new();
         public readonly List<SteamApp> SteamApps = new();
@@ -46,6 +46,29 @@ namespace ApriSiSteam
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             LoadSteamData();
+        }
+
+
+        private void LoadCategories()
+        {
+            var json = File.ReadAllText(@"Games.json");
+            var games = JsonConvert.DeserializeObject<List<SteamApp>>(json);
+            var tags = new List<string>();
+            foreach (var game in games)
+            {
+                foreach (var tag in game.AppCategories!)
+                {
+                    if (tags.Contains(tag)) continue;
+                    tags.Add(tag);
+                    Dispatcher.Invoke(() => {
+                        var checkbox = new CheckBox();
+                        checkbox.Content = tag;
+                        checkbox.Foreground = Brushes.White;
+                        CategoryList.Items.Add(checkbox);
+                    });
+                }
+
+            }
         }
 
         private void CheckGamesButton_Click(object sender, RoutedEventArgs e)
@@ -91,12 +114,12 @@ namespace ApriSiSteam
             }
 
             var json = File.ReadAllText(@"Games.json");
-            List<SteamApp>? games = JsonConvert.DeserializeObject<List<SteamApp>>(json);
+            var games = JsonConvert.DeserializeObject<List<SteamApp>>(json);
 
             foreach (var clientGame in clientGames)
                 foreach (var game in games!)
                     if (game.Appid == clientGame.Key)
-                        if (game.AppCategories!.Contains("Online Co-op") || game.UserDefinedCategories.Contains("Co-op"))
+                        if (game.UserDefinedCategories != null && (game.AppCategories!.Contains("Online Co-op") || game.UserDefinedCategories.Contains("Co-op")))
                         {
                             var steamAppControl = new SteamAppControl();
                             steamAppControl.NameDisplay.Text = clientGame.Value;
@@ -140,9 +163,7 @@ namespace ApriSiSteam
 
         public async void GetOwnedGamesAsync(int startCount, int endCount)
         {
-            var ownedGames = new List<SteamApp>();
-
-            for (int i = startCount; i < endCount; i++)
+            for (var i = startCount; i < endCount; i++)
             {
                 var game = await GetSteamApp((int)OwnedGames[i].Appid);
 
@@ -151,49 +172,41 @@ namespace ApriSiSteam
             }
         }
 
-        public int loadedGames = 0;
-        public async Task<SteamApp> GetSteamApp(int appid)
+        public int LoadedGames = 0;
+        public Task<SteamApp> GetSteamApp(int appid)
         {
             try
             {
-                HtmlWeb web = new HtmlWeb();
+                var web = new HtmlWeb();
                 using var client = new HttpClient();
 
                 web.UseCookies = true;
 
-                Uri uri = new Uri($"https://store.steampowered.com/app/{appid}");
+                var uri = new Uri($"https://store.steampowered.com/app/{appid}");
 
                 web.PreRequest += request =>
                 {
-                    CookieContainer cookieContainer = new CookieContainer();
+                    var cookieContainer = new CookieContainer();
                     cookieContainer.Add(new Cookie("birthtime", "312850801") { Domain = uri.Host });
                     request.CookieContainer = cookieContainer;
                     return true;
                 };
 
-                HtmlDocument doc = web.Load(uri);
+                var doc = web.Load(uri);
 
-                var Categories = doc.DocumentNode.SelectNodes("//a[@class='game_area_details_specs_ctn']");
-                var UserDefinedCategories = doc.DocumentNode.SelectNodes("//a[@class='app_tag']");
+                var categories = doc.DocumentNode.SelectNodes("//a[@class='game_area_details_specs_ctn']");
+                var userDefinedCategories = doc.DocumentNode.SelectNodes("//a[@class='app_tag']");
 
                 var image = doc.DocumentNode.SelectSingleNode("//img[@class='game_header_image_full']");
-                var Desc = doc.DocumentNode.SelectSingleNode("//div[@class='game_description_snippet']");
-
-                var ageGateImage = doc.DocumentNode.SelectSingleNode("//div[@class='img_ctn']");
+                var description = doc.DocumentNode.SelectSingleNode("//div[@class='game_description_snippet']");
 
                 var category = new List<string>();
                 var userDefinedCategory = new List<string>();
-                if (Categories != null)
+                if (categories != null)
                 {
-                    foreach (var item in Categories)
-                    {
-                        category.Add(item.InnerText);
-                    }
+                    category.AddRange(categories.Select(item => item.InnerText));
 
-                    foreach (var item in UserDefinedCategories)
-                    {
-                        userDefinedCategory.Add(Regex.Replace(item.InnerText, @"\n|\r|\t", string.Empty));
-                    }
+                    userDefinedCategory.AddRange(userDefinedCategories.Select(item => Regex.Replace(item.InnerText, @"\n|\r|\t", string.Empty)));
 
                     var steamApp = new SteamApp
                     {
@@ -203,27 +216,23 @@ namespace ApriSiSteam
                         ImgPath = image.Attributes["src"].Value,
                     };
 
-                    if (Desc != null)
-                        steamApp.Description = Regex.Replace(Desc.InnerText, @"\n|\r|\t", string.Empty);
+                    if (description != null)
+                        steamApp.Description = Regex.Replace(description.InnerText, @"\n|\r|\t", string.Empty);
 
-                    loadedGames++;
-                    Debug.WriteLine(appid + $" - {loadedGames}/{OwnedGames.Count}");
+                    LoadedGames++;
+                    Debug.WriteLine(appid + $" - {LoadedGames}/{OwnedGames.Count}");
                     Dispatcher.Invoke(() =>
                     {
-                        LoadingDisplay.Text = $"{loadedGames}/{OwnedGames.Count}";
+                        LoadingDisplay.Text = $"{LoadedGames}/{OwnedGames.Count}";
                     });
-                    return steamApp;
+                    return Task.FromResult(steamApp);
                 }
-                else
-                {
-                    return null;
-                }
-
             }
             catch
             {
-                return null;
+                return Task.FromResult<SteamApp>(null);
             }
+            return Task.FromResult<SteamApp>(null);
         }
 
         private void ExitButton_OnClick(object sender, RoutedEventArgs e)
@@ -243,12 +252,12 @@ namespace ApriSiSteam
             UsernameDisplay.Text = SteamClient.Name;
             GameCountDisplay.Text = "Games Owned: " + OwnedGames.Count;
 
-            HtmlWeb web = new HtmlWeb();
+            var web = new HtmlWeb();
             using var client = new HttpClient();
             web.UserAgent = "Mozilla/5.0 (X11; CrOS x86_64 14816.131.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
 
-            Uri uri = new Uri($"https://steamdb.info/calculator/{SteamClient.SteamId}/?cc=eu");
-            HtmlDocument doc = web.Load(uri);
+            var uri = new Uri($"https://steamdb.info/calculator/{SteamClient.SteamId}/?cc=eu");
+            var doc = web.Load(uri);
 
             var profileImage = doc.DocumentNode.SelectSingleNode("//img[@class='avatar']");
             ProfileImage.Source = new BitmapImage(new Uri(profileImage.Attributes["src"].Value));
@@ -310,15 +319,6 @@ namespace ApriSiSteam
 
         private void TopOverlay_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => DragMove();
 
-        private void SteamAPIButton_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            System.Diagnostics.Process.Start(new ProcessStartInfo
-            {
-                FileName = "https://steamcommunity.com/dev",
-                UseShellExecute = true
-            });
-        }
-
         public void LoadSteamData()
         {
             var clientUserGames = OwnedGamesRepository.GetOwnedGames(SteamClient.SteamId);
@@ -329,8 +329,8 @@ namespace ApriSiSteam
 
             Friends = SteamFriends.GetFriends().ToList();
 
-            List<int> split = SplitListCount(2, OwnedGames.Count);
-            for (int i = 0; i < split.Count - 1; i++)
+            var split = SplitListCount(2, OwnedGames.Count);
+            for (var i = 0; i < split.Count - 1; i++)
             {
                 var tis = split[i];
                 var tis2 = split[i + 1];
@@ -344,9 +344,9 @@ namespace ApriSiSteam
 
         public List<int> SplitListCount(int splitCount, int listCount)
         {
-            int split = listCount / splitCount;
+            var split = listCount / splitCount;
             var SplitListsCount = new List<int>();
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 SplitListsCount.Add(split * i);
             }
