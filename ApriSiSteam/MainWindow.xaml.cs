@@ -337,26 +337,30 @@ namespace ApriSiSteam
 
             Friends = SteamFriends.GetFriends().ToList();
 
-            int devidedCount = (int)clientUserGames.Count! / 2;
-            var ThreadGamecount = new List<int>();
-
-            for (int i = 0; i < 2; i++)
+            List<int> split = SplitListCount(2, OwnedGames.Count);
+            for (int i = 0; i < split.Count - 1; i++)
             {
-                ThreadGamecount.Add(devidedCount * i);
-            }
-            ThreadGamecount.Add((int)clientUserGames.Count);
-
-
-            for (int i = 0; i < ThreadGamecount.Count - 1; i++)
-            {
-                var tis = ThreadGamecount[i];
-                var tis2 = ThreadGamecount[i + 1];
+                var tis = split[i];
+                var tis2 = split[i + 1];
 
                 var UpdateCategoryThread = new Thread(() => UpdateCategories(false, tis, tis2));
                 UpdateCategoryThread.Start();
             }
 
             LoadProfileInformation();
+        }
+
+        public List<int> SplitListCount(int splitCount, int listCount)
+        {
+            int split = listCount / splitCount;
+            var SplitListsCount = new List<int>();
+            for (int i = 0; i < 2; i++)
+            {
+                SplitListsCount.Add(split * i);
+            }
+            SplitListsCount.Add((int)listCount);
+
+            return SplitListsCount;
         }
 
         private void CategoryList_Loaded(object sender, RoutedEventArgs e)
