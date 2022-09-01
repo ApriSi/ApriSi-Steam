@@ -1,43 +1,33 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
 using ApriSiSteam.Models;
 using ApriSiSteam.Repositories;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Steamworks;
-using Steamworks.Ugc;
-using static System.Net.Mime.MediaTypeNames;
 using Brushes = System.Windows.Media.Brushes;
 
 namespace ApriSiSteam
 {
-    /// Ooooh we're half way there, OOOOOOH OOOH SQUIDWARD ON A CHAIR.. TAKE MY HAND AND WE'LL MAKE IT I SWEAR OOOOOOOOH SQUIDWARD ON A CHAIR
-    /// SQUIIIIDWAARD OOON A CHAAIIIR
     public partial class MainWindow : Window
     {
-        public static List<Game> OwnedGames = new();
-        public List<SteamApp> SteamApps = new();
+        public static readonly List<Game> OwnedGames = new();
+        public readonly List<SteamApp> SteamApps = new();
 
         public static List<Friend>? Friends;
-        public static List<Friend> SelectedFriends = new List<Friend>();
+        public static readonly List<Friend> SelectedFriends = new List<Friend>();
 
         public MainWindow()
         {
@@ -53,12 +43,12 @@ namespace ApriSiSteam
             }
         }
 
-        private async void WindowLoaded(object sender, RoutedEventArgs e)
+        private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             LoadSteamData();
         }
 
-        private async void CheckGamesButton_Click(object sender, RoutedEventArgs e)
+        private void CheckGamesButton_Click(object sender, RoutedEventArgs e)
         {
             if (SelectedFriends.Count <= 0)
                 return;
@@ -75,16 +65,18 @@ namespace ApriSiSteam
             Dictionary<int, string> clientGames = new();
 
             foreach (var clientGame in OwnedGames)
-                if (!clientGames.ContainsKey((int)clientGame.Appid))
+                if (!clientGames.ContainsKey((int)clientGame.Appid!))
                     clientGames.Add((int)clientGame.Appid!, clientGame.Name!);
 
             foreach (var friend in SelectedFriends)
             {
                 var friendOwnedGames = OwnedGamesRepository.GetOwnedGames(friend.Id);
+
                 if (friendOwnedGames is null) return;
+
                 friendGames.Add(friend.Id, new Dictionary<int, string>());
-                var games = friendOwnedGames;
-                foreach (var game in games)
+
+                foreach (var game in friendOwnedGames)
                     foreach (var clientGame in OwnedGames)
                         if (game.Name == clientGame.Name && !friendGames[friend.Id].ContainsKey((int)game.Appid!))
                             friendGames[friend.Id].Add((int)game.Appid!, game.Name!);
@@ -99,12 +91,12 @@ namespace ApriSiSteam
             }
 
             var json = File.ReadAllText(@"Games.json");
-            List<SteamApp> Games = JsonConvert.DeserializeObject<List<SteamApp>>(json);
+            List<SteamApp>? games = JsonConvert.DeserializeObject<List<SteamApp>>(json);
 
             foreach (var clientGame in clientGames)
-                foreach (var game in Games)
+                foreach (var game in games!)
                     if (game.Appid == clientGame.Key)
-                        if (game.AppCategories.Contains("Online Co-op") || game.UserDefinedCategories.Contains("Co-op"))
+                        if (game.AppCategories!.Contains("Online Co-op") || game.UserDefinedCategories.Contains("Co-op"))
                         {
                             var steamAppControl = new SteamAppControl();
                             steamAppControl.NameDisplay.Text = clientGame.Value;
@@ -122,7 +114,7 @@ namespace ApriSiSteam
         }
 
         string[] categories = { "co-op", "multi-player", "online co-op" };
-        private async void UpdateCategories(bool forceUpdate, int startCount, int endCount)
+        private void UpdateCategories(bool forceUpdate, int startCount, int endCount)
         {
            
             if (!File.Exists("Games.Json") || forceUpdate)
