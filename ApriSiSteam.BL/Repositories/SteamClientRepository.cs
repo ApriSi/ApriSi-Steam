@@ -20,8 +20,8 @@ public static class SteamClientRepository
         };
         var response = Scraper.ScrapeHtmlNodes($"https://steamdb.info/calculator/{Steam.GetClientSteamId()}/", requests, null);
 
-        steamClient.Level = response[0].InnerText;
-        steamClient.Avatar = response[2].Attributes["src"].Value;
+        steamClient.Level = response[0][0].InnerText;
+        steamClient.Avatar = response[1][0].Attributes["src"].Value;
 
         return steamClient;
     }

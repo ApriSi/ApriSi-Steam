@@ -12,16 +12,11 @@ public static class Scraper
     public static List<string> ScrapeMuliple(string url, RequestItem requestItems, List<Cookie>? cookies)
     {
         var htmlNodes = ScrapeHtmlNodes(url, new List<RequestItem>() { requestItems }, cookies);
-        return htmlNodes.Select(scrape => scrape.InnerText).ToList();
+
+        return htmlNodes[0].Select(scrape => scrape.InnerText).ToList();
     }
 
-    public static List<string> ScrapeStrings(string url, List<RequestItem> requestItems, List<Cookie>? cookies)
-    {
-        var htmlNodes = ScrapeHtmlNodes(url, requestItems , cookies);
-        return htmlNodes.Select(scrape => scrape.InnerText).ToList();
-    }
-
-    public static List<HtmlNode> ScrapeHtmlNodes(string url, List<RequestItem> requestItems, List<Cookie>? cookies)
+    public static List<List<HtmlNode>> ScrapeHtmlNodes(string url, List<RequestItem> requestItems, List<Cookie>? cookies)
     {
         var uri = new Uri(url);
         var web = new HtmlWeb();
@@ -45,8 +40,9 @@ public static class Scraper
         }
 
         var doc = web.Load(uri);
+        var htmlNodeListContainer = requestItems.Select(requestItem => doc.DocumentNode.SelectNodes(requestItem.Request).ToList()).ToList();
 
-        return requestItems.SelectMany(request => doc.DocumentNode.SelectNodes(request.Request)).ToList();
+        return htmlNodeListContainer;
     }
     private static Cookie GenerateCookie(Cookie cookieData, Uri uri)
     {

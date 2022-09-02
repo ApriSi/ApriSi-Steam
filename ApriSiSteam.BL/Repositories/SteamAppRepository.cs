@@ -1,6 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using ApriSiSteam.BL.Models;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Steamworks;
 
@@ -14,9 +16,10 @@ public class SteamAppRepository
 
         /*var categoryRequests = new List<RequestItem>()
         {
-            "//a[@class='game_area_details_specs_ctn']",
-            "//img[@class='game_header_image_full']"
-        };*/
+            new() { Request = "//a[@class='game_area_details_specs_ctn']" }
+        };
+
+        var cookies = new List<Cookie>() { new Cookie("birthtime", "312850801") };
 
         var requests = new List<RequestItem>()
         {
@@ -27,21 +30,24 @@ public class SteamAppRepository
             }
         };
 
-        var cookies = new List<Cookie>() { new Cookie("birthtime", "312850801") };
-        var response = Scraper.ScrapeHtmlNodes($"https://steamdb.info/calculator/{steamId}/?cc=eu", requests, null);
+        var responseApps = Scraper.ScrapeHtmlNodes($"https://steamdb.info/calculator/{steamId}/?cc=eu", requests, null);
 
-        foreach (var app in response)
+        var categories = new List<string>();
+        foreach (var app in responseApps[0])
         {
+            var appid = app.Attributes["data-appid"].Value;
+            
+            var responseCategories = Scraper.ScrapeHtmlNodes($"https://store.steampowered.com/app/{appid}", categoryRequests, cookies);
+            categories.AddRange(responseCategories[0].Select(category => category.InnerText));
             var steamApp = new SteamApp()
             {
-                Appid = app.Attributes["data-appid"].Value,
+                Appid = appid,
                 Name = app.SelectSingleNode("td[@class='text-left']").SelectSingleNode("a").InnerText,
-                //Image = steamAppNode.SelectSingleNode("td[@class='applogo']").SelectSingleNode("a").SelectSingleNode("img").Attributes["src"].Value,
-                //Categories = categories
+                Image = $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/header.jpg",
+                Categories = categories
             };
-
             steamApps.Add(steamApp);
-        }
+        }*/
 
         return steamApps;
     }
