@@ -1,0 +1,238 @@
+﻿<Window x:Class="ApriSiSteam.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ApriSiSteam.WPF"
+        Title="MainWindow" Height="675" Width="1200" WindowStyle="None" ResizeMode="NoResize"
+        Background="#2C394B">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="TopPanel"
+              MouseDown="OnTopPanelMouseDown"
+              Background="#082032">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="35"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid>
+                <TextBlock Text="ApriSi Steam"
+                           VerticalAlignment="Center"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           FontSize="20"
+                           Height="25"
+                           Margin="2,0,0,10"/>
+            </Grid>
+
+            <Button x:Name="MinimizeButton"
+                    Grid.Column="1"
+                    Foreground="White"
+                    Background="#ffaf40"
+                    BorderThickness="0"
+                    Content="─"
+                    FontSize="15"
+                    Click="OnMinimizeClicked"/>
+
+            <Button x:Name="ExitButton"
+                    Grid.Column="3"
+                    Background="#ff4d4d"
+                    Foreground="White"
+                    BorderThickness="0"
+                    Content="X"
+                    FontSize="15"
+                    Click="OnExitClicked"/>
+
+        </Grid>
+
+        <Grid x:Name="BottomPanel"
+              Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="470"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="ProfilePanel">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="250"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Grid x:Name="ProfileInformationPanel"
+                      Loaded="OnProfileInformationLoaded">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="165"/>
+                        <RowDefinition Height="15"/>
+                        <RowDefinition Height="15"/>
+                        <RowDefinition Height="15"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Image x:Name="AvatarImage"
+                           Source="https://avatars.akamai.steamstatic.com/3da502bfc03b9f9d54c29467309e5229dcbf2b27_full.jpg"
+                           Height="150"
+                           Width="150"
+                           VerticalAlignment="Top"
+                           HorizontalAlignment="Left"
+                           Margin="15,15,0,0"/>
+
+                    <TextBlock x:Name="NameDisplay"
+                               Grid.Row="1"
+                               Text="BAUHAUS/FoxNews"
+                               Foreground="White"
+                               FontWeight="Bold"
+                               Margin="15,0,0,0"/>
+
+                    <TextBlock x:Name="LevelDisplay"
+                               Grid.Row="2"
+                               Text="Level: 69420"
+                               Foreground="White"
+                               FontWeight="Bold"
+                               Margin="15,0,0,0"/>
+
+
+                    <TextBlock x:Name="GameCountDisplay"
+                               Grid.Row="3"
+                               Text="Games: 1000"
+                               Foreground="White"
+                               FontWeight="Bold"
+                               Margin="15,0,0,0"/>
+                </Grid>
+
+                <Grid x:Name="CategoryPanel"
+                      Grid.Row="1">
+                    <TextBlock Text="Steam Tags"
+                               Foreground="White"
+                               FontWeight="Bold"
+                               Margin="15,0,0,0"
+                               VerticalAlignment="Top"
+                               Height="25"/>
+
+                    <ItemsControl x:Name="CategoryList"
+                                  Background="#082032"
+                                  Height="290"
+                                  Width="200"
+                                  VerticalAlignment="Top"
+                                  Margin="-25,18,0,0"
+                                  Loaded="OnCategoryListLoaded">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ScrollViewer x:Name="ScrollViewer" 
+                                              Padding="{TemplateBinding Padding}"
+                                              VerticalScrollBarVisibility="Auto"
+                                              Background="#082032">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
+                </Grid>
+                <TextBlock x:Name="VersionLabel"
+                           Grid.Row="1"
+                           Text="VERSION"
+                           Height="13"
+                           FontSize="10"
+                           Margin="2,0,0,0"
+                           FontWeight="Bold"
+                           VerticalAlignment="Bottom"
+                           HorizontalAlignment="Left"
+                           Foreground="White"
+                           Loaded="OnVersionDisplayLoaded"/>
+            </Grid>
+
+            <Grid x:Name="FriendListPanel"
+                  Grid.Column="1">
+                <ItemsControl x:Name="FriendList"
+                              Background="#082032"
+                              Height="530"
+                              Width="184"
+                              VerticalAlignment="Top"
+                              Margin="-115,15,0,0"
+                              Loaded="OnFriendListLoaded">
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Background="#082032">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                </ItemsControl>
+
+                <TextBlock x:Name="FriendNameDisplay"
+                           Background="#082032"
+                           Foreground="White"
+                           Height="530"
+                           Width="184"
+                           VerticalAlignment="Top"
+                           HorizontalAlignment="Right"
+                           Margin="0,15,0,0"/>
+            </Grid>
+
+            <Grid x:Name="GameListPanel"
+                  Grid.Column="2">
+                <ItemsControl x:Name="GameList"
+                              Background="#082032"
+                              Height="530"
+                              Width="460"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Top"
+                              Margin="0,15,10,0">
+                    <ItemsControl.Template>
+                        <ControlTemplate>
+                            <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Background="#082032">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </ControlTemplate>
+                    </ItemsControl.Template>
+                </ItemsControl>
+
+                <Button x:Name="CheckGamesButton"
+                        Background="#3ae374"
+                        Height="45"
+                        Width="325"
+                        Margin="20"
+                        Content="Check Games"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        FontSize="20"
+                        VerticalAlignment="Bottom"
+                        Click="CheckGamesClicked"/>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="LoadingPanel"
+              Grid.Row="1"
+              Background="#353b48"
+              Visibility="Hidden">
+            <TextBlock
+                Text="Loading Games"
+                Foreground="White"
+                FontSize="50"
+                FontWeight="Bold"
+                VerticalAlignment="Center"
+                TextAlignment="Center"
+                Margin="0,90,0,0"/>
+            <TextBlock x:Name="LoadingDisplay"
+                       Text="Please Wait"
+                       Foreground="White"
+                       FontSize="25"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       TextAlignment="Center"
+                       Margin="0,200,0,0"/>
+        </Grid>
+    </Grid>
+</Window>

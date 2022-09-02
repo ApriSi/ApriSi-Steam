@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32811.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApriSiSteam.WPF", "ApriSiSteam.WPF\ApriSiSteam.WPF.csproj", "{EE62690F-1AD9-4496-83B2-2B333BC3EABE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApriSiSteam.BL", "ApriSiSteam.BL\ApriSiSteam.BL.csproj", "{35A2A4A7-D2CF-47C5-BA9F-BF27DC0E66E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE62690F-1AD9-4496-83B2-2B333BC3EABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE62690F-1AD9-4496-83B2-2B333BC3EABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE62690F-1AD9-4496-83B2-2B333BC3EABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE62690F-1AD9-4496-83B2-2B333BC3EABE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35A2A4A7-D2CF-47C5-BA9F-BF27DC0E66E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35A2A4A7-D2CF-47C5-BA9F-BF27DC0E66E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35A2A4A7-D2CF-47C5-BA9F-BF27DC0E66E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35A2A4A7-D2CF-47C5-BA9F-BF27DC0E66E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A5D7B86C-F7B5-476C-B3A4-87C86B1889D7}
+	EndGlobalSection
+EndGlobal
