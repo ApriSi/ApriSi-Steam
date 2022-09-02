@@ -24,26 +24,7 @@ namespace ApriSiSteam.WPF
         {
             InitializeComponent();
             Steam.RunSteam();
-            SteamAppRepository.CreateOwnedGamesJSON(Steam.GetClientSteamId());
-
-            var ownedGames = SteamAppRepository.ReadOwnedGames();
-
-            if (ownedGames == null) return;
-            foreach (var game in ownedGames)
-            {
-                Debug.WriteLine(game.Appid);
-                Debug.WriteLine(game.Name);
-                Debug.WriteLine(game.Image);
-                Debug.WriteLine("\nCATEGORY");
-                foreach (var category in game.Categories!)
-                {
-                    Debug.WriteLine(category);
-                }
-
-                Debug.WriteLine("\n\n");
-            }
-
-            Debug.WriteLine("Main Window Loaded");
+            SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId());
         }
 
         private void OnMinimizeClicked(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
@@ -65,8 +46,7 @@ namespace ApriSiSteam.WPF
             LevelDisplay.Text = "Level: " + steamClient.Level;
             AvatarImage.Source = new BitmapImage(new Uri(steamClient.Avatar!));
 
-            // When OwnedGames is available
-            //GameCountDisplay.Text = "Games: " + steamClient.GameCount;
+            GameCountDisplay.Text = "Games: " + SteamAppRepository.ReadOwnedGames()!.Count;
         }
 
         private void OnCategoryListLoaded(object sender, RoutedEventArgs e)

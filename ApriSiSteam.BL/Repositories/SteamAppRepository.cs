@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using ApriSiSteam.BL.Models;
 using Newtonsoft.Json;
 using Steamworks;
@@ -11,35 +12,41 @@ public class SteamAppRepository
     {
         var steamApps = new List<SteamApp>();
 
-        var requests = new List<string>() { "//tr[@class='app']" };
-        var categoryRequests = new List<string>() { "//a[@class='game_area_details_specs_ctn']", "//img[@class='game_header_image_full']" };
+        /*var categoryRequests = new List<RequestItem>()
+        {
+            "//a[@class='game_area_details_specs_ctn']",
+            "//img[@class='game_header_image_full']"
+        };*/
+
+        var requests = new List<RequestItem>()
+        {
+            new()
+            {
+                Request = "//tr[@class='app']",
+                Attribute = "data-appid"
+            }
+        };
 
         var cookies = new List<Cookie>() { new Cookie("birthtime", "312850801") };
+        var response = Scraper.ScrapeHtmlNodes($"https://steamdb.info/calculator/{steamId}/?cc=eu", requests, null);
 
-        var response = Scraper.GetMultipleNodes($"https://steamdb.info/calculator/{steamId}/?cc=eu", requests, null);
-
-        /*foreach (var steamAppNode in response)
+        foreach (var app in response)
         {
-            var appid = steamAppNode.Attributes["data-appid"].Value;
-
-            var categoryResponse = Scraper.GetMultipleNodes($"https://store.steampowered.com/app/{appid}", categoryRequests, cookies);
-            var categories = categoryResponse.Select(category => category.InnerText).ToList();
-
             var steamApp = new SteamApp()
             {
-                Appid = appid,
-                Name = steamAppNode.SelectSingleNode("td[@class='text-left']").SelectSingleNode("a").InnerText,
-                Image = steamAppNode.SelectSingleNode("td[@class='applogo']").SelectSingleNode("a").SelectSingleNode("img").Attributes["src"].Value,
-                Categories = categories
+                Appid = app.Attributes["data-appid"].Value,
+                Name = app.SelectSingleNode("td[@class='text-left']").SelectSingleNode("a").InnerText,
+                //Image = steamAppNode.SelectSingleNode("td[@class='applogo']").SelectSingleNode("a").SelectSingleNode("img").Attributes["src"].Value,
+                //Categories = categories
             };
 
             steamApps.Add(steamApp);
-        }*/
+        }
 
         return steamApps;
     }
 
-    public static void CreateOwnedGamesJSON(string steamId)
+    public static void CreateOwnedGamesJson(string steamId)
     {
         if (File.Exists("ClientGames.json")) return;
         var ownedGames = GetOwnedGames(steamId);

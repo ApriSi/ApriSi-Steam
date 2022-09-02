@@ -1,4 +1,5 @@
-﻿using ApriSiSteam.BL.Models;
+﻿using System.Diagnostics;
+using ApriSiSteam.BL.Models;
 
 namespace ApriSiSteam.BL.Repositories;
 
@@ -7,17 +8,20 @@ public static class SteamClientRepository
     public static SteamClient GetSteamClientInformation()
     {
         var steamClient = new SteamClient();
-        var requests = new List<string>()
+        var requests = new List<RequestItem>()
         {
-            "//ul[@class='player-info']//span",
-            "//img[@class='avatar']",
+            new RequestItem()
+            {
+                Request = "//ul[@class='player-info']//span"
+            },
+            new RequestItem() {
+                Request = "//img[@class='avatar']"
+            }
         };
-
-        var response = Scraper.GetSingleNodes($"https://steamdb.info/calculator/{Steam.GetClientSteamId()}/?cc=eu",
-            requests, null);
+        var response = Scraper.ScrapeHtmlNodes($"https://steamdb.info/calculator/{Steam.GetClientSteamId()}/", requests, null);
 
         steamClient.Level = response[0].InnerText;
-        steamClient.Avatar = response[1].Attributes["src"].Value;
+        steamClient.Avatar = response[2].Attributes["src"].Value;
 
         return steamClient;
     }
