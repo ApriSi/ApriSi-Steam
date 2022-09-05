@@ -22,6 +22,7 @@ namespace ApriSiSteam.WPF
 
         public MainWindow()
         {
+            // steam://run/480
             InitializeComponent();
             Steam.RunSteam();
             SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId());
@@ -33,6 +34,11 @@ namespace ApriSiSteam.WPF
 
         private void CheckGamesClicked(object sender, RoutedEventArgs e)
         {
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = "steam://run/480",
+                UseShellExecute = true
+            });
             Debug.WriteLine("Loading Games");
         }
 

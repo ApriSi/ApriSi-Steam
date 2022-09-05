@@ -5,6 +5,7 @@ using ApriSiSteam.BL.Models;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Steamworks;
+using SteamClient = Steamworks.SteamClient;
 
 namespace ApriSiSteam.BL.Repositories;
 
@@ -13,41 +14,45 @@ public class SteamAppRepository
     private static List<SteamApp> GetOwnedGames(string steamId)
     {
         var steamApps = new List<SteamApp>();
+        
+        var responseApps = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/?cc=eu", false);
 
-        /*var categoryRequests = new List<RequestItem>()
-        {
-            new() { Request = "//a[@class='game_area_details_specs_ctn']" }
-        };
-
-        var cookies = new List<Cookie>() { new Cookie("birthtime", "312850801") };
-
-        var requests = new List<RequestItem>()
-        {
-            new()
-            {
-                Request = "//tr[@class='app']",
-                Attribute = "data-appid"
-            }
-        };
-
-        var responseApps = Scraper.ScrapeHtmlNodes($"https://steamdb.info/calculator/{steamId}/?cc=eu", requests, null);
+        var apps = responseApps.SelectNodes("//tr[@class='app']");
 
         var categories = new List<string>();
-        foreach (var app in responseApps[0])
+
+        foreach (var app in apps)
         {
+        
             var appid = app.Attributes["data-appid"].Value;
+            var name = app.SelectSingleNode("//td[@class='text-left']").InnerText;
+            Debug.WriteLine(name);
+
+            var responseCategories = Scraper.Scrape($"https://store.steampowered.com/app/{appid}", true);
+
+            var categoryCollection = responseCategories.SelectNodes("//a[@class='game_area_details_specs_ctn']//div[@class='label']");
             
-            var responseCategories = Scraper.ScrapeHtmlNodes($"https://store.steampowered.com/app/{appid}", categoryRequests, cookies);
-            categories.AddRange(responseCategories[0].Select(category => category.InnerText));
+            if(categoryCollection is not null)
+                foreach (var category in categoryCollection)
+                {   
+                    if (category is not null)
+                    {
+                        categories.Add(category.InnerText);
+                    }
+                }
+            
+
+
             var steamApp = new SteamApp()
             {
                 Appid = appid,
-                Name = app.SelectSingleNode("td[@class='text-left']").SelectSingleNode("a").InnerText,
+                Name = name,
                 Image = $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/header.jpg",
                 Categories = categories
             };
+
             steamApps.Add(steamApp);
-        }*/
+        }
 
         return steamApps;
     }
