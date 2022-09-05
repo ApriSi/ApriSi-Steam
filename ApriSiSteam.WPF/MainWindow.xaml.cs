@@ -78,5 +78,19 @@ namespace ApriSiSteam.WPF
             if(steamClient.AvatarFrame is not null)
                 UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!));
         }
+
+        private void OnSteamTagsLoaded(object sender, RoutedEventArgs e)
+        {
+            var tags = SteamAppRepository.GetTags();
+
+            foreach (var checkBox in tags.Select(tag => new CheckBox()
+                     {
+                         Content = tag,
+                         Foreground = Brushes.White
+                     }))
+            {
+                SteamTagsList.Items.Add(checkBox);
+            }
+        }
     }
 }

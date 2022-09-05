@@ -140,7 +140,7 @@
                 </Grid.RowDefinitions>
                 <Grid Grid.Column="1" Grid.Row="1">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="200"/>
                         <ColumnDefinition Width="10"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
@@ -149,6 +149,8 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
                             <RowDefinition/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="100"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock x:Name="GamesCountTextBlock" FontWeight="SemiBold" Foreground="White">Games: 500</TextBlock>
@@ -166,6 +168,22 @@
                                           Padding="{TemplateBinding Padding}"
                                           VerticalScrollBarVisibility="Auto" 
                                           Background="#292929">
+
+                                        <ItemsPresenter />
+
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                        </ItemsControl>
+
+                        <ItemsControl Grid.Row="3" x:Name="SteamTagsList"
+                                      Loaded="OnSteamTagsLoaded">
+                            <ItemsControl.Template>
+                                <ControlTemplate>
+                                    <ScrollViewer x:Name="ScrollViewer" 
+                                                  Padding="{TemplateBinding Padding}"
+                                                  VerticalScrollBarVisibility="Auto" 
+                                                  Background="#292929">
 
                                         <ItemsPresenter />
 

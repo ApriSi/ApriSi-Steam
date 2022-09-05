@@ -21,6 +21,10 @@ public class SteamAppRepository
         {
             var appId = app["appID"]!.InnerText;
 
+            var httpClient = new HttpClient();
+            var appDetails = httpClient.GetAsync($"https://steamspy.com/api.php?request=appdetails&appid={appId}");
+            Debug.WriteLine(appDetails.Result.StatusCode);
+
             var steamApp = new SteamApp()
             {
                 Appid = appId,
@@ -51,5 +55,14 @@ public class SteamAppRepository
         var steamApps = JsonConvert.DeserializeObject<List<SteamApp>>(clientGames);
 
         return steamApps;
+    }
+
+    public static List<string> GetTags()
+    {
+        var responseTags = Scraper.Scrape("https://store.steampowered.com/search/");
+        var steamTags = responseTags.SelectNodes("//div[@class='tab_filter_control_row ']");
+        var sortedTags = steamTags.OrderBy(o => o.Attributes["data-loc"].Value).ToList();
+        
+        return sortedTags.Select(tag => tag.Attributes["data-loc"].Value).ToList();
     }
 }
