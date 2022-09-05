@@ -1,0 +1,184 @@
+﻿<Window x:Class="ApriSiSteam.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ApriSiSteam.WPF"
+        Title="MainWindow" Height="450" Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True">
+    <Grid Background="#121212">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" MouseLeftButtonDown="TopLeftButtonDown" Background="#202020" MouseDown="Top_OnMouseDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="Images/ApriSiLogo.png"
+                   Margin="1"/>
+
+            <Button Grid.Column="4" Background="#6200EE" BorderThickness="0.4" BorderBrush="{x:Null}" Foreground="White" Click="ExitButtonClick">X</Button>
+            <Button Grid.Column="3" Background="#7F22FD" BorderThickness="0.4" BorderBrush="{x:Null}" Foreground="White" Click="MaximizeButtonClick">🗖</Button>
+            <Button Grid.Column="2" Background="#9E55FC" BorderThickness="0.4" BorderBrush="{x:Null}" Foreground="White" Click="MinimizeButtonClick">🗕</Button>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Background="#1e1e1e"
+                  Loaded="UserInformationLoaded">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="210"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Background="#1e1e1e">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="130"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="1">
+                            <Image x:Name="UserImage" Width="108" Source="https://avatars.akamai.steamstatic.com/5aac6257c49fcd61afd92042434199ffbe18a340_full.jpg"></Image>
+                        </Grid>
+                        <Image Grid.Row="1" x:Name="UserImageFrame"/>
+
+                        <Grid Grid.Row="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="UserNameTextBlock" Grid.Row="1" Foreground="#bb86fc" FontWeight="Bold">FoxNews</TextBlock>
+                            <TextBlock x:Name="UserLevelTextBlock" FontWeight="SemiBold" Grid.Row="2" Foreground="White" FontSize="10">Level: 100</TextBlock>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <Grid Grid.Row="1" Background="#1e1e1e">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="10"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="10"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ItemsControl Grid.Row="1" 
+                                  Grid.Column="1" 
+                                  x:Name="CategoryList">
+                        <ItemsControl.Template>
+                            <ControlTemplate>
+                                <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto" 
+                                          Background="#292929">
+                                    <ItemsPresenter />
+                                </ScrollViewer>
+                            </ControlTemplate>
+                        </ItemsControl.Template>
+                    </ItemsControl>
+                </Grid>
+                <TextBlock x:Name="VersionText"
+                           Grid.Row="1" 
+                           Loaded="OnVersionDisplayLoaded"
+                           Text="1.1-Release"
+                           VerticalAlignment="Bottom"
+                           FontSize="5"
+                           Margin="2,0,0,1"
+                           Foreground="#bb86fc"
+                           FontWeight="Black"/>
+
+                <Image Grid.Row="1" 
+                       Source="Images/SteamLogoWhite.png"
+                       Height="6"
+                       Width="6"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Left"
+                       Margin="34,0,0,1"/>
+                <TextBlock x:Name="SteamText"
+                           Grid.Row="1" 
+                           Loaded="OnVersionDisplayLoaded"
+                           Text="SUPPORTED BY STEAM"
+                           VerticalAlignment="Bottom"
+                           FontSize="5"
+                           Margin="40,0,0,1"
+                           Foreground="White"
+                           FontWeight="Black"/>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="10"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Column="1" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock x:Name="GamesCountTextBlock" FontWeight="SemiBold" Foreground="White">Games: 500</TextBlock>
+
+                        <ItemsControl Grid.Row="1" x:Name="GamesItemControl" ItemsSource="{Binding GameControl}"
+                                      Loaded="OnGamesLoaded">
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="UserControl">
+                                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ContentControl_PreviewMouseLeftButtonDown" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.Template>
+                                <ControlTemplate>
+                                    <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto" 
+                                          Background="#292929">
+
+                                        <ItemsPresenter />
+
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                        </ItemsControl>
+                    </Grid>
+                    <Grid Grid.Column="2">
+                        <Frame x:Name="GameFrame" Source="Pages/GamePage.xaml" NavigationUIVisibility="Hidden"></Frame>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
