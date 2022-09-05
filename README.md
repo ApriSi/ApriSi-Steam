@@ -8,5 +8,5 @@ so we decided to create this application to check which games we both have that 
 We decided to make this our education project and we are currently fixing up all that ugly code and making it much better.
 
 # How do we gather information
-We use web scraping to get information from SteamDB and Steam,
-we also used Facepunch Steamworks to connect to the Steam Client.
+We use web scraping to get information from Steam and
+we also use Facepunch Steamworks to connect to the Steam Client.
