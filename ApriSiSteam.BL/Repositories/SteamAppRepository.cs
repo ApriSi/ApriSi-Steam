@@ -1,55 +1,36 @@
-﻿using System;
+﻿using System.Data.SqlTypes;
 using System.Diagnostics;
-using System.Net;
+using System.Web;
+using System.Xml;
 using ApriSiSteam.BL.Models;
-using HtmlAgilityPack;
 using Newtonsoft.Json;
-using Steamworks;
-using SteamClient = Steamworks.SteamClient;
 
 namespace ApriSiSteam.BL.Repositories;
 
 public class SteamAppRepository
 {
-    private static List<SteamApp> GetOwnedGames(string steamId)
+    private static List<SteamApp> GetOwnedGames(string steamId, bool isFriend = false)
     {
         var steamApps = new List<SteamApp>();
-        
-        var responseApps = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/?cc=eu", false);
 
-        var apps = responseApps.SelectNodes("//tr[@class='app']");
+        var xmlDocument = new XmlDocument();
+        xmlDocument.Load($"https://steamcommunity.com/profiles/{steamId}/games?xml=1");
 
-        var categories = new List<string>();
-
-        foreach (var app in apps)
+        var apps = xmlDocument.GetElementsByTagName("game");
+        foreach (XmlNode app in apps)
         {
-        
-            var appid = app.Attributes["data-appid"].Value;
-            var name = app.SelectSingleNode("//td[@class='text-left']").InnerText;
-            Debug.WriteLine(name);
-
-            var responseCategories = Scraper.Scrape($"https://store.steampowered.com/app/{appid}", true);
-
-            var categoryCollection = responseCategories.SelectNodes("//a[@class='game_area_details_specs_ctn']//div[@class='label']");
-            
-            if(categoryCollection is not null)
-                foreach (var category in categoryCollection)
-                {   
-                    if (category is not null)
-                    {
-                        categories.Add(category.InnerText);
-                    }
-                }
-            
-
+            var appId = app["appID"]!.InnerText;
 
             var steamApp = new SteamApp()
             {
-                Appid = appid,
-                Name = name,
-                Image = $"https://cdn.cloudflare.steamstatic.com/steam/apps/{appid}/header.jpg",
-                Categories = categories
+                Appid = appId,
             };
+
+            if (!isFriend)
+            {
+                steamApp.Name = app["name"]!.InnerText;
+                steamApp.Image = $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg";
+            }
 
             steamApps.Add(steamApp);
         }

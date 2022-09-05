@@ -1,0 +1,90 @@
+﻿<Page x:Class="ApriSiSteam.WPF.Pages.GamePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ApriSiSteam.WPF.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="300" d:DesignWidth="600"
+      Title="GamePage">
+
+    <Grid Background="#FF333333">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="10"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10"/>
+            <RowDefinition/>
+            <RowDefinition Height="10"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Column="0" Grid.Row="0" Background="#FF424242"></Grid>
+            <Image x:Name="GameImage" Grid.Column="0" Grid.Row="0"></Image>
+
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <TextBlock x:Name="GameTitleTextBlock" Grid.Column="1" Grid.Row="1" Background="#FF424242" Foreground="White" FontSize="26" Padding="10,0,0,0"></TextBlock>
+            </Grid>
+
+            <ItemsControl Grid.Row="2" Grid.Column="0" x:Name="GameTagItemControl">
+                <ItemsControl.Template>
+                    <ControlTemplate>
+                        <ScrollViewer x:Name="ScrollViewer" 
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto" 
+                                          Background="#FF424242">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+            </ItemsControl>
+
+            <Grid Grid.Row="2" Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock x:Name="GameDescriptionTextBlock" Grid.Column="1" Background="#FF424242" TextWrapping="WrapWithOverflow" Foreground="White" Padding="10"></TextBlock>
+                <Button Grid.Row="2"
+                        Grid.Column="1" 
+                        Background="#46c534" 
+                        Foreground="White" 
+                        FontWeight="Bold"
+                        Click="GamePlayButtonOnClick"
+                        BorderThickness="0">Play</Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -10,6 +11,8 @@ using System.Windows.Media.Imaging;
 using ApriSiSteam.BL;
 using ApriSiSteam.BL.Models;
 using ApriSiSteam.BL.Repositories;
+using ApriSiSteam.WPF.Pages;
+using ApriSiSteam.WPF.UserControls;
 
 namespace ApriSiSteam.WPF
 {
@@ -19,6 +22,7 @@ namespace ApriSiSteam.WPF
     public partial class MainWindow : Window
     {
         private static List<SteamFriend> SelectedFriends = new();
+        private GamePage gamePage = new GamePage();
 
         public MainWindow()
         {
@@ -26,89 +30,53 @@ namespace ApriSiSteam.WPF
             InitializeComponent();
             Steam.RunSteam();
             SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId());
+
+            GameFrame.Navigate(gamePage);
         }
 
-        private void OnMinimizeClicked(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
-        private void OnExitClicked(object sender, RoutedEventArgs e) => Environment.Exit(Environment.ExitCode);
-        private void OnTopPanelMouseDown(object sender, MouseButtonEventArgs e) => DragMove();
+        private void OnVersionDisplayLoaded(object sender, RoutedEventArgs e) => VersionText.Text = AppInformation.VERSION;
 
-        private void CheckGamesClicked(object sender, RoutedEventArgs e)
+        private void Top_OnMouseDown(object sender, MouseButtonEventArgs e) => DragMove();
+
+        private void TopLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Process.Start(new ProcessStartInfo()
-            {
-                FileName = "steam://run/480",
-                UseShellExecute = true
-            });
-            Debug.WriteLine("Loading Games");
+            if(e.ClickCount >= 2)
+                WindowState = WindowState != WindowState.Normal ? WindowState.Normal : WindowState.Maximized;
         }
 
-        private void OnVersionDisplayLoaded(object sender, RoutedEventArgs e) => VersionLabel.Text = AppInformation.VERSION;
+        private void ExitButtonClick(object sender, RoutedEventArgs e) => Environment.Exit(Environment.ExitCode);
+        private void MinimizeButtonClick(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+        private void MaximizeButtonClick(object sender, RoutedEventArgs e) => WindowState = WindowState != WindowState.Normal ? WindowState.Normal : WindowState.Maximized;
+        
 
-        private void OnProfileInformationLoaded(object sender, RoutedEventArgs e)
+        private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var gameControl = sender as GameControl;
+            gamePage.SetData(gameControl.GameName, gameControl.Image, gameControl.GameID);
+        }
+
+
+        private void OnGamesLoaded(object sender, RoutedEventArgs e)
+        {
+            var games = SteamAppRepository.ReadOwnedGames();
+            foreach (var gameControl in games!.Select(game => new GameControl(game.Name!, game.Image!, game.Appid)))
+            {
+                GamesItemControl.Items.Add(gameControl);
+            }
+
+
+        }
+
+        private void UserInformationLoaded(object sender, RoutedEventArgs e)
         {
             var steamClient = SteamClientRepository.GetSteamClientInformation();
-            
-            NameDisplay.Text = Steam.GetClientName();
-            LevelDisplay.Text = "Level: " + steamClient.Level;
-            AvatarImage.Source = new BitmapImage(new Uri(steamClient.Avatar!));
+            UserNameTextBlock.Text = Steam.GetClientName();
+            UserLevelTextBlock.Text = "Level: " + steamClient.Level;
+            GamesCountTextBlock.Text = "Games: " + SteamAppRepository.ReadOwnedGames()!.Count;
+            UserImage.Source = new BitmapImage(new Uri(steamClient.Avatar!));
 
-            GameCountDisplay.Text = "Games: " + SteamAppRepository.ReadOwnedGames()!.Count;
-        }
-
-        private void OnCategoryListLoaded(object sender, RoutedEventArgs e)
-        {
-            Debug.WriteLine("Category List Loaded");
-        }
-
-        private void OnFriendListLoaded(object sender, RoutedEventArgs e)
-        {
-            var friendList = Steam.GetFriends();
-
-            foreach (var friend in friendList)
-            {
-                var checkBox = new CheckBox()
-                {
-                    Content = friend.Name,
-                    DataContext = friend,
-                    Foreground = Brushes.White
-                };
-
-                checkBox.Checked += OnFriendCheckboxChecked;
-                checkBox.Unchecked += OnFriendCheckboxUnchecked;
-
-                FriendList.Items.Add(checkBox);
-            }
-        }
-
-        private void OnFriendCheckboxUnchecked(object sender, RoutedEventArgs e)
-        {
-            var checkBox = (CheckBox)sender;
-            var friend = (SteamFriend)checkBox.DataContext;
-
-            Debug.WriteLine("Removed {0} from SelectedFriends", friend.Name);
-            SelectedFriends.Remove(friend);
-
-            DisplaySelectedUsers();
-        }
-
-        private void OnFriendCheckboxChecked(object sender, RoutedEventArgs e)
-        {
-            var checkBox = (CheckBox)sender;
-            var friend = (SteamFriend)checkBox.DataContext;
-
-            Debug.WriteLine("Added {0} to SelectedFriends", friend.Name);
-            SelectedFriends.Add(friend);
-
-            DisplaySelectedUsers();
-        }
-
-        private void DisplaySelectedUsers()
-        {
-            FriendNameDisplay.Text = string.Empty;
-            foreach (var friend in SelectedFriends)
-            {
-                FriendNameDisplay.Text += $"Name: {friend.Name}\nId: {friend.SteamId}\n";
-            }
+            if(steamClient.AvatarFrame is not null)
+                UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!));
         }
     }
 }

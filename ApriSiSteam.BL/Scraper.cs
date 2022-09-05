@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Net;
+using System.Xml;
 using HtmlAgilityPack;
 
 namespace ApriSiSteam.BL;
 
 public static class Scraper
 {
-    private const string UserAgent = "Mozilla/5.0 (X11; CrOS x86_64 14816.131.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36";
-
-    public static HtmlNode Scrape(string url, bool steam)
+    public static HtmlNode Scrape(string url, bool steam = false, bool loadHtmlString = false)
     {
-        var web = new HtmlWeb
-        {
-            UserAgent = UserAgent
-        };
+        var web = new HtmlWeb();
+        var doc = web.Load(new Uri(url));
+
+        if(loadHtmlString)
+            doc.LoadHtml(url);
 
         if (steam)
         {
@@ -27,8 +27,6 @@ public static class Scraper
                 return true;
             };
         }
-
-        var doc = web.Load(new Uri(url));
 
         return doc.DocumentNode;
     }

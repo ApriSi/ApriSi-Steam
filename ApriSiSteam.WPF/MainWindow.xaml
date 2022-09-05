@@ -4,235 +4,181 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ApriSiSteam.WPF"
-        Title="MainWindow" Height="675" Width="1200" WindowStyle="None" ResizeMode="NoResize"
-        Background="#2C394B">
-    <Grid>
+        Title="MainWindow" Height="450" Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True">
+    <Grid Background="#121212">
         <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
+            <RowDefinition Height="20"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="TopPanel"
-              MouseDown="OnTopPanelMouseDown"
-              Background="#082032">
+        <Grid Grid.Row="0" MouseLeftButtonDown="TopLeftButtonDown" Background="#202020" MouseDown="Top_OnMouseDown">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition/>
-                <ColumnDefinition Width="35"/>
-                <ColumnDefinition Width="5"/>
-                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="20"/>
             </Grid.ColumnDefinitions>
 
-            <Grid>
-                <TextBlock Text="ApriSi Steam"
-                           VerticalAlignment="Center"
-                           FontWeight="Bold"
-                           Foreground="White"
-                           FontSize="20"
-                           Height="25"
-                           Margin="2,0,0,10"/>
-            </Grid>
+            <Image Source="Images/ApriSiLogo.png"
+                   Margin="1"/>
 
-            <Button x:Name="MinimizeButton"
-                    Grid.Column="1"
-                    Foreground="White"
-                    Background="#ffaf40"
-                    BorderThickness="0"
-                    Content="─"
-                    FontSize="15"
-                    Click="OnMinimizeClicked"/>
-
-            <Button x:Name="ExitButton"
-                    Grid.Column="3"
-                    Background="#ff4d4d"
-                    Foreground="White"
-                    BorderThickness="0"
-                    Content="X"
-                    FontSize="15"
-                    Click="OnExitClicked"/>
-
+            <Button Grid.Column="4" Background="#6200EE" BorderThickness="0.4" BorderBrush="{x:Null}" Foreground="White" Click="ExitButtonClick">X</Button>
+            <Button Grid.Column="3" Background="#7F22FD" BorderThickness="0.4" BorderBrush="{x:Null}" Foreground="White" Click="MaximizeButtonClick">🗖</Button>
+            <Button Grid.Column="2" Background="#9E55FC" BorderThickness="0.4" BorderBrush="{x:Null}" Foreground="White" Click="MinimizeButtonClick">🗕</Button>
         </Grid>
 
-        <Grid x:Name="BottomPanel"
-              Grid.Row="1">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
-                <ColumnDefinition Width="470"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Grid x:Name="ProfilePanel">
+            <Grid Grid.Row="0" Background="#1e1e1e"
+                  Loaded="UserInformationLoaded">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="250"/>
+                    <RowDefinition Height="210"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <Grid x:Name="ProfileInformationPanel"
-                      Loaded="OnProfileInformationLoaded">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="165"/>
-                        <RowDefinition Height="15"/>
-                        <RowDefinition Height="15"/>
-                        <RowDefinition Height="15"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Image x:Name="AvatarImage"
-                           Source="https://avatars.akamai.steamstatic.com/3da502bfc03b9f9d54c29467309e5229dcbf2b27_full.jpg"
-                           Height="150"
-                           Width="150"
-                           VerticalAlignment="Top"
-                           HorizontalAlignment="Left"
-                           Margin="15,15,0,0"/>
+                <Grid Grid.Row="0" Background="#1e1e1e">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock x:Name="NameDisplay"
-                               Grid.Row="1"
-                               Text="BAUHAUS/FoxNews"
-                               Foreground="White"
-                               FontWeight="Bold"
-                               Margin="15,0,0,0"/>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="130"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
 
-                    <TextBlock x:Name="LevelDisplay"
-                               Grid.Row="2"
-                               Text="Level: 69420"
-                               Foreground="White"
-                               FontWeight="Bold"
-                               Margin="15,0,0,0"/>
+                        <Grid Grid.Row="1">
+                            <Image x:Name="UserImage" Width="108" Source="https://avatars.akamai.steamstatic.com/5aac6257c49fcd61afd92042434199ffbe18a340_full.jpg"></Image>
+                        </Grid>
+                        <Image Grid.Row="1" x:Name="UserImageFrame"/>
 
-
-                    <TextBlock x:Name="GameCountDisplay"
-                               Grid.Row="3"
-                               Text="Games: 1000"
-                               Foreground="White"
-                               FontWeight="Bold"
-                               Margin="15,0,0,0"/>
+                        <Grid Grid.Row="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="10"/>
+                                <RowDefinition Height="15"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="UserNameTextBlock" Grid.Row="1" Foreground="#bb86fc" FontWeight="Bold">FoxNews</TextBlock>
+                            <TextBlock x:Name="UserLevelTextBlock" FontWeight="SemiBold" Grid.Row="2" Foreground="White" FontSize="10">Level: 100</TextBlock>
+                        </Grid>
+                    </Grid>
                 </Grid>
 
-                <Grid x:Name="CategoryPanel"
-                      Grid.Row="1">
-                    <TextBlock Text="Steam Tags"
-                               Foreground="White"
-                               FontWeight="Bold"
-                               Margin="15,0,0,0"
-                               VerticalAlignment="Top"
-                               Height="25"/>
+                <Grid Grid.Row="1" Background="#1e1e1e">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition/>
+                        <RowDefinition Height="10"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="10"/>
+                    </Grid.ColumnDefinitions>
 
-                    <ItemsControl x:Name="CategoryList"
-                                  Background="#082032"
-                                  Height="290"
-                                  Width="200"
-                                  VerticalAlignment="Top"
-                                  Margin="-25,18,0,0"
-                                  Loaded="OnCategoryListLoaded">
+                    <ItemsControl Grid.Row="1" 
+                                  Grid.Column="1" 
+                                  x:Name="CategoryList">
                         <ItemsControl.Template>
                             <ControlTemplate>
                                 <ScrollViewer x:Name="ScrollViewer" 
-                                              Padding="{TemplateBinding Padding}"
-                                              VerticalScrollBarVisibility="Auto"
-                                              Background="#082032">
+                                          Padding="{TemplateBinding Padding}"
+                                          VerticalScrollBarVisibility="Auto" 
+                                          Background="#292929">
                                     <ItemsPresenter />
                                 </ScrollViewer>
                             </ControlTemplate>
                         </ItemsControl.Template>
                     </ItemsControl>
                 </Grid>
-                <TextBlock x:Name="VersionLabel"
-                           Grid.Row="1"
-                           Text="VERSION"
-                           Height="13"
-                           FontSize="10"
-                           Margin="2,0,0,0"
-                           FontWeight="Bold"
+                <TextBlock x:Name="VersionText"
+                           Grid.Row="1" 
+                           Loaded="OnVersionDisplayLoaded"
+                           Text="1.1-Release"
                            VerticalAlignment="Bottom"
-                           HorizontalAlignment="Left"
+                           FontSize="5"
+                           Margin="2,0,0,1"
+                           Foreground="#bb86fc"
+                           FontWeight="Black"/>
+
+                <Image Grid.Row="1" 
+                       Source="Images/SteamLogoWhite.png"
+                       Height="6"
+                       Width="6"
+                       VerticalAlignment="Bottom"
+                       HorizontalAlignment="Left"
+                       Margin="34,0,0,1"/>
+                <TextBlock x:Name="SteamText"
+                           Grid.Row="1" 
+                           Loaded="OnVersionDisplayLoaded"
+                           Text="SUPPORTED BY STEAM"
+                           VerticalAlignment="Bottom"
+                           FontSize="5"
+                           Margin="40,0,0,1"
                            Foreground="White"
-                           Loaded="OnVersionDisplayLoaded"/>
+                           FontWeight="Black"/>
             </Grid>
 
-            <Grid x:Name="FriendListPanel"
-                  Grid.Column="1">
-                <ItemsControl x:Name="FriendList"
-                              Background="#082032"
-                              Height="530"
-                              Width="184"
-                              VerticalAlignment="Top"
-                              Margin="-115,15,0,0"
-                              Loaded="OnFriendListLoaded">
-                    <ItemsControl.Template>
-                        <ControlTemplate>
-                            <ScrollViewer x:Name="ScrollViewer" 
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="10"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="10"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Column="1" Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock x:Name="GamesCountTextBlock" FontWeight="SemiBold" Foreground="White">Games: 500</TextBlock>
+
+                        <ItemsControl Grid.Row="1" x:Name="GamesItemControl" ItemsSource="{Binding GameControl}"
+                                      Loaded="OnGamesLoaded">
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="UserControl">
+                                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ContentControl_PreviewMouseLeftButtonDown" />
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.Template>
+                                <ControlTemplate>
+                                    <ScrollViewer x:Name="ScrollViewer" 
                                           Padding="{TemplateBinding Padding}"
-                                          VerticalScrollBarVisibility="Auto"
-                                          Background="#082032">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </ControlTemplate>
-                    </ItemsControl.Template>
-                </ItemsControl>
+                                          VerticalScrollBarVisibility="Auto" 
+                                          Background="#292929">
 
-                <TextBlock x:Name="FriendNameDisplay"
-                           Background="#082032"
-                           Foreground="White"
-                           Height="530"
-                           Width="184"
-                           VerticalAlignment="Top"
-                           HorizontalAlignment="Right"
-                           Margin="0,15,0,0"/>
+                                        <ItemsPresenter />
+
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                        </ItemsControl>
+                    </Grid>
+                    <Grid Grid.Column="2">
+                        <Frame x:Name="GameFrame" Source="Pages/GamePage.xaml" NavigationUIVisibility="Hidden"></Frame>
+                    </Grid>
+                </Grid>
             </Grid>
-
-            <Grid x:Name="GameListPanel"
-                  Grid.Column="2">
-                <ItemsControl x:Name="GameList"
-                              Background="#082032"
-                              Height="530"
-                              Width="460"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Top"
-                              Margin="0,15,10,0">
-                    <ItemsControl.Template>
-                        <ControlTemplate>
-                            <ScrollViewer x:Name="ScrollViewer" 
-                                          Padding="{TemplateBinding Padding}"
-                                          VerticalScrollBarVisibility="Auto"
-                                          Background="#082032">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </ControlTemplate>
-                    </ItemsControl.Template>
-                </ItemsControl>
-
-                <Button x:Name="CheckGamesButton"
-                        Background="#3ae374"
-                        Height="45"
-                        Width="325"
-                        Margin="20"
-                        Content="Check Games"
-                        Foreground="White"
-                        FontWeight="Bold"
-                        FontSize="20"
-                        VerticalAlignment="Bottom"
-                        Click="CheckGamesClicked"/>
-            </Grid>
-        </Grid>
-
-        <Grid x:Name="LoadingPanel"
-              Grid.Row="1"
-              Background="#353b48"
-              Visibility="Hidden">
-            <TextBlock
-                Text="Loading Games"
-                Foreground="White"
-                FontSize="50"
-                FontWeight="Bold"
-                VerticalAlignment="Center"
-                TextAlignment="Center"
-                Margin="0,90,0,0"/>
-            <TextBlock x:Name="LoadingDisplay"
-                       Text="Please Wait"
-                       Foreground="White"
-                       FontSize="25"
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       TextAlignment="Center"
-                       Margin="0,200,0,0"/>
         </Grid>
     </Grid>
 </Window>
