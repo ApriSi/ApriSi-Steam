@@ -1,5 +1,6 @@
 ﻿using System.Data.SqlTypes;
 using System.Diagnostics;
+using System.Net.Http.Json;
 using System.Web;
 using System.Xml;
 using ApriSiSteam.BL.Models;
@@ -21,9 +22,6 @@ public class SteamAppRepository
         {
             var appId = app["appID"]!.InnerText;
 
-            var httpClient = new HttpClient();
-            var appDetails = httpClient.GetAsync($"https://steamspy.com/api.php?request=appdetails&appid={appId}");
-            Debug.WriteLine(appDetails.Result.StatusCode);
 
             var steamApp = new SteamApp()
             {
@@ -34,6 +32,14 @@ public class SteamAppRepository
             {
                 steamApp.Name = app["name"]!.InnerText;
                 steamApp.Image = $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg";
+            
+                var responseApps = Scraper.Scrape($"https://store.steampowered.com/app/{appId}", steam: true);
+                var tags = responseApps.SelectNodes(
+                    "//a[@class='game_area_details_specs_ctn']//div[@class='label']");
+
+                if(tags is not null)
+                    foreach (var tag in tags)
+                        steamApp.Categories.Add(tag.InnerText);
             }
 
             steamApps.Add(steamApp);
