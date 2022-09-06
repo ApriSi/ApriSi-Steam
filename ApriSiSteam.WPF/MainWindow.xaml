@@ -126,7 +126,8 @@
 
             <Frame Grid.Column="1"
                    x:Name="PageFrame"
-                   Source="Pages/LoadingPage.xaml"/>
+                   Source="Pages/LoadingPage.xaml"
+                   NavigationUIVisibility="Hidden"/>
         </Grid>
     </Grid>
 </Window>

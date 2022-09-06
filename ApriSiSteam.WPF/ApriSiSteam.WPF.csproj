@@ -11,8 +11,4 @@
     <ProjectReference Include="..\ApriSiSteam.BL\ApriSiSteam.BL.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Images\" />
-  </ItemGroup>
-
 </Project>

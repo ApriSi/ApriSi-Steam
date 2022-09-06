@@ -10,14 +10,20 @@ namespace ApriSiSteam.BL.Repositories;
 
 public class SteamAppRepository
 {
+    public static int CurrentLoadedGames;
+    public static int GamesToLoad;
+
     private static List<SteamApp> GetOwnedGames(string steamId, bool isFriend = false)
     {
+        CurrentLoadedGames = 0;
         var steamApps = new List<SteamApp>();
 
         var xmlDocument = new XmlDocument();
         xmlDocument.Load($"https://steamcommunity.com/profiles/{steamId}/games?xml=1");
 
         var apps = xmlDocument.GetElementsByTagName("game");
+
+        GamesToLoad = apps.Count;
         foreach (XmlNode app in apps)
         {
             var appId = app["appID"]!.InnerText;
@@ -42,6 +48,7 @@ public class SteamAppRepository
                         steamApp.Categories.Add(tag.InnerText);
             }
 
+            CurrentLoadedGames++;
             steamApps.Add(steamApp);
         }
 

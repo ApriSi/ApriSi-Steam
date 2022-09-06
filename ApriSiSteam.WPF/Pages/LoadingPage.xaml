@@ -8,7 +8,21 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="LoadingPage">
 
-    <Grid>
-        <TextBlock Foreground="White" FontSize="150">Hello World!</TextBlock>
+    <Grid Loaded="LoadingPageLoaded">
+        <TextBlock VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Text="Loading Games"
+                   FontSize="25"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   Margin="0,0,0,66"/>
+
+        <TextBlock x:Name="LoadingDisplay"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Text="0/100"
+                   FontSize="20"
+                   FontWeight="Bold"
+                   Foreground="White"/>
     </Grid>
 </Page>

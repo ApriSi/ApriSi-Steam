@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,9 +29,6 @@ namespace ApriSiSteam.WPF
         {
             InitializeComponent();
             Steam.RunSteam();
-
-            var gameLoadThread = new Thread(() => SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId()));
-            gameLoadThread.Start();
         }
 
         private void OnVersionDisplayLoaded(object sender, RoutedEventArgs e) =>
@@ -60,5 +58,12 @@ namespace ApriSiSteam.WPF
             if (steamClient.AvatarFrame is not null)
                 UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!));
         }
+
+        public void SetPage(Page page)
+        {
+            
+            PageFrame.Navigate(page);
+        }
+        
     }
 }
