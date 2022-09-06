@@ -2,5 +2,5 @@
 
 public class AppInformation
 {
-    public static readonly string VERSION = "1.2-Beta";
+    public static readonly string VERSION = "1.3-Beta";
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,12 +23,12 @@ namespace ApriSiSteam.WPF.UserControls
     public partial class GameControl : UserControl
     {
         public string GameName;
-        public BitmapImage Image;
+        public string Image;
         public string GameID;
         public GameControl(string gameName, string imageUrl, string gameId)
         {
             GameName = gameName;
-            Image = new BitmapImage(new Uri(imageUrl));
+            Image = imageUrl;
             GameID = gameId;
 
             InitializeComponent();
@@ -35,12 +36,12 @@ namespace ApriSiSteam.WPF.UserControls
             SetData();
         }
 
-        private void SetData()
+        public void SetData()
         {
             if (Steam.IsGameInstalled(GameID))
                 GamePanel.Background = (Brush)new BrushConverter().ConvertFromString("#01A299")!;
 
-            GameImage.Source = Image;
+            GameImage.Source = new BitmapImage(new Uri(Image));
             GameNameText.Text = GameName;
         }
     }

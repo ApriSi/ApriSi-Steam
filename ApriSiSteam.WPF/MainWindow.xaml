@@ -4,7 +4,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ApriSiSteam.WPF"
-        Title="MainWindow" Height="450" Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True">
+        Title="MainWindow" Height="500" Width="800" WindowStyle="None" ResizeMode="CanResizeWithGrip" AllowsTransparency="True">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="StyleXaml/Scrollbar.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid Background="#121212">
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
@@ -33,6 +42,7 @@
                        Foreground="White"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
+                       HorizontalAlignment="Right"
                        x:Name="VersionText"/>
         </Grid>
         <Grid Grid.Row="1">

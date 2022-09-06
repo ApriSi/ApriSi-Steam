@@ -1,5 +1,8 @@
-﻿using ApriSiSteam.BL.Models;
+﻿using System.Diagnostics;
+using System.Xml;
+using ApriSiSteam.BL.Models;
 using Steamworks;
+using SteamClient = ApriSiSteam.BL.Models.SteamClient;
 
 namespace ApriSiSteam.BL;
 
@@ -14,12 +17,22 @@ public static class Steam
 
     public static List<SteamFriend> GetFriends()
     {
-        var friends = new List<SteamFriend>(SteamFriends.GetFriends().Select(friend => new SteamFriend()
+        List<SteamFriend> friends = new List<SteamFriend>();
+
+        foreach (var steamFriend in SteamFriends.GetFriends())
         {
-            Name = friend.Name, 
-            SteamId = friend.Id.ToString(),
-            Avatar = @"https://avatars.akamai.steamstatic.com/3da502bfc03b9f9d54c29467309e5229dcbf2b27_full.jpg"
-        }).ToList());
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load($"https://steamcommunity.com/profiles/{steamFriend.Id}?xml=1");
+            var image = xmlDocument.GetElementsByTagName("avatarFull")[0]!.InnerText;
+
+            var friend = new SteamFriend()
+            {
+                Name = steamFriend.Name,
+                SteamId = steamFriend.Id.ToString(),
+                Avatar = image
+            };
+            friends.Add(friend);
+        }
 
         return friends;
     }

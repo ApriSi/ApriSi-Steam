@@ -7,7 +7,13 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="MainPage">
-
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/StyleXaml/Scrollbar.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
     <Grid>
         <Grid>
             <Grid>
@@ -33,11 +39,18 @@
                             <RowDefinition Height="20"/>
                             <RowDefinition/>
                             <RowDefinition Height="10"/>
-                            <RowDefinition Height="100"/>
+                            <RowDefinition Height="125"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock x:Name="GamesCountTextBlock" FontWeight="SemiBold" Foreground="White">Games: 500</TextBlock>
+                        <Button x:Name="RefreshGamesButton" Grid.Row="0" Width="16"
+                                Background="#6200EE"
+                                Foreground="White"
+                                HorizontalAlignment="Right"
+                                BorderThickness="0"
+                                Margin="0,2,0,2"
 
+                                Padding="0,-3,0,0" Click="RefreshGamesButton_Click">↻</Button>
                         <ItemsControl Grid.Row="1" x:Name="GamesItemControl" ItemsSource="{Binding GameControl}"
                                       Loaded="OnGamesLoaded">
                             <ItemsControl.ItemContainerStyle>
@@ -64,6 +77,7 @@
                             <ItemsControl.Template>
                                 <ControlTemplate>
                                     <ScrollViewer x:Name="ScrollViewer" 
+                                                  Style="{DynamicResource ResourceKey=styleScrollViewer}"
                                                   Padding="{TemplateBinding Padding}"
                                                   VerticalScrollBarVisibility="Auto" 
                                                   Background="#292929">

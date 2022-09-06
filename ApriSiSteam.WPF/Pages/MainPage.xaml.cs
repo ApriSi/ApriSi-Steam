@@ -28,14 +28,14 @@ namespace ApriSiSteam.WPF.Pages
         public MainPage()
         {
             InitializeComponent();
-
+            GamesCountTextBlock.Text = "Games: " + SteamAppRepository.ReadOwnedGames()!.Count; 
             GameFrame.Navigate(gamePage);
         }
 
         private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var gameControl = sender as GameControl;
-            gamePage.SetData(gameControl.GameName, gameControl.Image, gameControl.GameID);
+            gamePage.SetData(gameControl.GameName, gameControl.GameImage.Source, gameControl.GameID);
         }
 
 
@@ -61,6 +61,16 @@ namespace ApriSiSteam.WPF.Pages
                      }))
             {
                 SteamTagsList.Items.Add(checkBox);
+            }
+        }
+
+        private void RefreshGamesButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in GamesItemControl.Items)
+            {
+                var gameItem = item as GameControl;
+
+                gameItem!.SetData();
             }
         }
     }

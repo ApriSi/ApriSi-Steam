@@ -20,7 +20,6 @@ public class SteamAppRepository
 
         var xmlDocument = new XmlDocument();
         xmlDocument.Load($"https://steamcommunity.com/profiles/{steamId}/games?xml=1");
-
         var apps = xmlDocument.GetElementsByTagName("game");
 
         GamesToLoad = apps.Count;
@@ -69,7 +68,7 @@ public class SteamAppRepository
 
         return steamApps;
     }
-
+    
     public static List<string> GetTags()
     {
         var responseTags = Scraper.Scrape("https://store.steampowered.com/search/");

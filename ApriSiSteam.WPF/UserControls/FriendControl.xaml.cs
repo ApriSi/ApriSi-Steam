@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -20,6 +22,7 @@ namespace ApriSiSteam.WPF.UserControls
             SteamId = steamId;
             NameDisplay.Text = name;
             ImageDisplay.Source = new BitmapImage(new Uri(avatar));
+
         }
     }
 }

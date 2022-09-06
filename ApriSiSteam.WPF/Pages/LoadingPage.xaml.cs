@@ -22,6 +22,7 @@ using ApriSiSteam.BL.Repositories;
 
 namespace ApriSiSteam.WPF.Pages
 {
+    
     /// <summary>
     /// Interaction logic for LoadingPage.xaml
     /// </summary>

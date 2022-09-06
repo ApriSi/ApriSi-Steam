@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace ApriSiSteam.WPF.Pages
@@ -17,7 +18,7 @@ namespace ApriSiSteam.WPF.Pages
             InitializeComponent();
         }
 
-        public void SetData(string name, BitmapImage image, string id)
+        public void SetData(string name, ImageSource image, string id)
         {
             GameTitleTextBlock.Text = name;
             GameImage.Source = image;
