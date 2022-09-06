@@ -16,17 +16,16 @@ public static class Scraper
         if(loadHtmlString)
             doc.LoadHtml(url);
 
-        if (steam)
+        if (!steam) return doc.DocumentNode;
+
+        web.UseCookies = true;
+        web.PreRequest += request =>
         {
-            web.UseCookies = true;
-            web.PreRequest += request =>
-            {
-                var cookieContainer = new CookieContainer();
-                cookieContainer.Add(new Cookie("birthtime", "312850801") { Domain = new Uri(url).Host });
-                request.CookieContainer = cookieContainer;
-                return true;
-            };
-        }
+            var cookieContainer = new CookieContainer();
+            cookieContainer.Add(new Cookie("birthtime", "312850801") { Domain = new Uri(url).Host });
+            request.CookieContainer = cookieContainer;
+            return true;
+        };
 
         return doc.DocumentNode;
     }

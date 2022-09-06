@@ -10,7 +10,7 @@ public static class SteamClientRepository
         var clientHtmlNode = Scraper.Scrape($"https://steamcommunity.com/profiles/{Steam.GetClientSteamId()}");
 
         steamClient.Level = clientHtmlNode.SelectSingleNode("//div[@class='persona_name persona_level']//div//span").InnerText;
-        steamClient.Avatar = clientHtmlNode.SelectSingleNode("//div[@class='playerAvatarAutoSizeInner']//img").Attributes["src"].Value;
+        steamClient.Avatar = clientHtmlNode.SelectSingleNode("//div[@class='playerAvatarAutoSizeInner']/img").Attributes["src"].Value;
 
         if(clientHtmlNode.SelectSingleNode("//div[@class='profile_avatar_frame']//img") is not null)
             steamClient.AvatarFrame = clientHtmlNode.SelectSingleNode("//div[@class='profile_avatar_frame']//img")
