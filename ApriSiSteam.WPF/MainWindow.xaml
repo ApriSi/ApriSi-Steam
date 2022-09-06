@@ -94,7 +94,13 @@
                     
                     <ItemsControl Grid.Row="1" 
                                   Grid.Column="1" 
-                                  x:Name="FriendList">
+                                  x:Name="FriendList"
+                                  ItemsSource="{Binding FriendControl}">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="UserControl">
+                                <EventSetter Event="PreviewMouseLeftButtonDown" Handler="FriendControl_PreviewMouseLeftButtonDown" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
                         <ItemsControl.Template>
                             <ControlTemplate>
                                 <ScrollViewer x:Name="ScrollViewer" 
@@ -109,17 +115,8 @@
 
                     <ItemsControl Grid.Row="1" 
                                   Grid.Column="3" 
-                                  x:Name="FriendImageList">
-                        <ItemsControl.Template>
-                            <ControlTemplate>
-                                <ScrollViewer x:Name="ScrollViewer" 
-                                              Padding="{TemplateBinding Padding}"
-                                              VerticalScrollBarVisibility="Auto" 
-                                              Background="#292929">
-                                    <ItemsPresenter />
-                                </ScrollViewer>
-                            </ControlTemplate>
-                        </ItemsControl.Template>
+                                  x:Name="FriendImageList"
+                                  Background="#292929">
                     </ItemsControl>
                 </Grid>
             </Grid>

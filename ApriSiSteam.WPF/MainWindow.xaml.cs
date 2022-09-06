@@ -23,8 +23,6 @@ namespace ApriSiSteam.WPF
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static List<SteamFriend> SelectedFriends = new();
-
         public MainWindow()
         {
             InitializeComponent();
@@ -57,6 +55,12 @@ namespace ApriSiSteam.WPF
 
             if (steamClient.AvatarFrame is not null)
                 UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!));
+
+            foreach (var friend in SteamFriendRepository.GetFriends())
+            {
+                var friendControl = new FriendControl(friend.Name!, friend.Avatar!, friend.SteamId!);
+                FriendList.Items.Add(friendControl);
+            }
         }
 
         public void SetPage(Page page)
@@ -64,6 +68,17 @@ namespace ApriSiSteam.WPF
             
             PageFrame.Navigate(page);
         }
-        
+
+        private void FriendControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var friendControl = sender as FriendControl;
+
+            var friendImage = new Image()
+            {
+                Source = friendControl!.ImageDisplay.Source,
+                DataContext = friendControl.SteamId
+            };
+            FriendImageList.Items.Add(friendImage);
+        }
     }
 }

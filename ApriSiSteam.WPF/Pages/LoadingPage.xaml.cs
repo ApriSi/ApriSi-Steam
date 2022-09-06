@@ -34,12 +34,16 @@ namespace ApriSiSteam.WPF.Pages
 
         public async void Loading()
         {
-            SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId());
+            var creatingThread =
+                new Thread(() => { SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId()); });
+            creatingThread.Start();
+
             while (!File.Exists("ClientGames.json"))
             {
+                Debug.WriteLine("a");
                 Dispatcher.Invoke(() =>
                 {
-                    LoadingDisplay.Text = $"{SteamAppRepository.CurrentLoadedGames}/{SteamAppRepository.CurrentLoadedGames}";
+                    LoadingDisplay.Text = $"{SteamAppRepository.CurrentLoadedGames}/{SteamAppRepository.GamesToLoad}";
                 });
                 Thread.Sleep(100);
             }
