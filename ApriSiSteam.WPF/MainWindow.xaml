@@ -43,7 +43,8 @@
                        FontWeight="Bold"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Right"
-                       x:Name="VersionText"/>
+                       x:Name="VersionText"
+                       Loaded="OnVersionDisplayLoaded"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
