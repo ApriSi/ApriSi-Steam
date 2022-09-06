@@ -65,11 +65,14 @@ namespace ApriSiSteam.WPF
 
             var loadFriends = new Thread(() =>
             {
-                foreach (var friend in SteamFriendRepository.GetFriends())
+                Dispatcher.Invoke(() =>
                 {
-                    var friendControl = new FriendControl(friend.Name!, friend.Avatar!, friend.SteamId!);
-                    FriendList.Items.Add(friendControl);
-                }
+                    foreach (var friend in SteamFriendRepository.GetFriends())
+                    {
+                        var friendControl = new FriendControl(friend.Name!, friend.Avatar!, friend.SteamId!);
+                        FriendList.Items.Add(friendControl);
+                    }
+                });
             });
 
             loaduser.Start();
