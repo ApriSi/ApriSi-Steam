@@ -8,7 +8,7 @@
       d:DesignHeight="300" d:DesignWidth="600"
       Title="GamePage">
 
-    <Grid Background="Transparent">
+    <Grid Background="#1c1c1c">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition/>
