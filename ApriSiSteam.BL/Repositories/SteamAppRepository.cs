@@ -65,12 +65,18 @@ public class SteamAppRepository
 
         foreach (var friend in friends)
         {
-            var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{friend.SteamId}/");
-            var games = htmlNode.SelectNodes("//tr[@class='app']");
-            
             friendGames.Add(friend.SteamId, new List<string>());
-            foreach (var game in games)
-                friendGames[friend.SteamId].Add(game.Attributes["data-appid"].Value);
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load($"https://steamcommunity.com/profiles/{friend.SteamId}/games?xml=1");
+            var apps = xmlDocument.GetElementsByTagName("game");
+
+            GamesToLoad = apps.Count;
+            foreach (XmlNode app in apps)
+            {
+                var appId = app["appID"]!.InnerText;
+                friendGames[friend.SteamId].Add(appId);
+            }
         }
 
         File.WriteAllText(@"FriendGames.json", JsonConvert.SerializeObject(friendGames));
