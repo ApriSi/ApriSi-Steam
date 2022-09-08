@@ -76,10 +76,12 @@
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.Template>
                                 <ControlTemplate>
-                                    <ScrollViewer x:Name="ScrollViewer" 
-                                          Padding="{TemplateBinding Padding}"
-                                          VerticalScrollBarVisibility="Auto" 
-                                          Background="#292929">
+                                    <ScrollViewer x:Name="ScrollViewer"
+                                                  VirtualizingStackPanel.IsVirtualizing="True" 
+                                                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                                                  Padding="{TemplateBinding Padding}"
+                                                  VerticalScrollBarVisibility="Auto" 
+                                                  Background="#1D1D1D">
 
                                         <ItemsPresenter />
 
@@ -108,7 +110,7 @@
                                                   Style="{DynamicResource ResourceKey=styleScrollViewer}"
                                                   Padding="{TemplateBinding Padding}"
                                                   VerticalScrollBarVisibility="Auto" 
-                                                  Background="#292929">
+                                                  Background="#1D1D1D">
 
                                         <ItemsPresenter />
 

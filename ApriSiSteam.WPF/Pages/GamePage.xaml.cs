@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
+using System.Web;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using ApriSiSteam.BL;
 
 namespace ApriSiSteam.WPF.Pages
 {
@@ -23,6 +25,15 @@ namespace ApriSiSteam.WPF.Pages
             GameTitleTextBlock.Text = name;
             GameImage.Source = image;
             gameID = id;
+
+            var data = Scraper.Scrape($"https://store.steampowered.com/app/{gameID}", true);
+            var description = data.SelectSingleNode("//div[@class='game_description_snippet']");
+            if (description != null)
+                GameDescriptionTextBlock.Text = HttpUtility.HtmlDecode(description.InnerHtml.Remove(0, 10));
+            else
+                GameDescriptionTextBlock.Text = "No Description";
+            
+
         }
 
         private void GamePlayButtonOnClick(object sender, RoutedEventArgs e)

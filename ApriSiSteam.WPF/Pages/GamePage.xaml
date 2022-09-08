@@ -8,7 +8,7 @@
       d:DesignHeight="300" d:DesignWidth="600"
       Title="GamePage">
 
-    <Grid Background="#FF333333">
+    <Grid Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition/>
@@ -31,7 +31,7 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <Grid Grid.Column="0" Grid.Row="0" Background="#FF424242"></Grid>
+            <Grid Grid.Column="0" Grid.Row="0" Background="#292929"></Grid>
             <Image x:Name="GameImage" Grid.Column="0" Grid.Row="0"></Image>
 
             <Grid Grid.Column="1">
@@ -47,7 +47,7 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
 
-                <TextBlock x:Name="GameTitleTextBlock" Grid.Column="1" Grid.Row="1" Background="#FF424242" Foreground="White" FontSize="26" Padding="10,0,0,0"></TextBlock>
+                <TextBlock x:Name="GameTitleTextBlock" Grid.Column="1" Grid.Row="1" Background="#292929" Foreground="White" FontSize="26" Padding="10,0,0,0"></TextBlock>
             </Grid>
 
             <ItemsControl Grid.Row="2" Grid.Column="0" x:Name="GameTagItemControl">
@@ -56,7 +56,7 @@
                         <ScrollViewer x:Name="ScrollViewer" 
                                           Padding="{TemplateBinding Padding}"
                                           VerticalScrollBarVisibility="Auto" 
-                                          Background="#FF424242">
+                                          Background="#292929">
                             <ItemsPresenter />
                         </ScrollViewer>
                     </ControlTemplate>
@@ -76,10 +76,10 @@
                     <ColumnDefinition Width="10"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock x:Name="GameDescriptionTextBlock" Grid.Column="1" Background="#FF424242" TextWrapping="WrapWithOverflow" Foreground="White" Padding="10"></TextBlock>
+                <TextBlock x:Name="GameDescriptionTextBlock" Grid.Column="1" Background="#292929" TextWrapping="WrapWithOverflow" Foreground="White" Padding="8" Height="auto" VerticalAlignment="Top"></TextBlock>
                 <Button Grid.Row="2"
                         Grid.Column="1" 
-                        Background="#46c534" 
+                        Background="#6200EE" 
                         Foreground="White" 
                         FontWeight="Bold"
                         Click="GamePlayButtonOnClick"

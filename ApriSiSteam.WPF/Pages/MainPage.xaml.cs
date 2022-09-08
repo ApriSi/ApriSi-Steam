@@ -41,7 +41,7 @@ namespace ApriSiSteam.WPF.Pages
         private void ContentControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var gameControl = sender as GameControl;
-            gamePage.SetData(gameControl.GameName, gameControl.GameImage.Source, gameControl.GameID);
+            gamePage.SetData(gameControl!.GameName, gameControl.GameImage.Source, gameControl.GameID);
         }
 
 

@@ -11,7 +11,20 @@ public static class Scraper
     public static HtmlNode Scrape(string url, bool steam = false, bool loadHtmlString = false)
     {
         var web = new HtmlWeb();
-        web.UserAgent = web.Load($"https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome").DocumentNode.SelectNodes("//span[@class='code']").First().InnerHtml;
+        if(!steam) 
+            web.UserAgent = web.Load($"https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome").DocumentNode.SelectNodes("//span[@class='code']").First().InnerHtml;
+        
+        if (steam)
+        {
+            web.UseCookies = true;
+            web.PreRequest += request =>
+            {
+                var cookieContainer = new CookieContainer();
+                cookieContainer.Add(new Cookie("birthtime", "312850801") { Domain = new Uri(url).Host });
+                request.CookieContainer = cookieContainer;
+                return true;
+            };
+        }
 
         var doc = web.Load(new Uri(url));
 
@@ -20,14 +33,6 @@ public static class Scraper
 
         if (!steam) return doc.DocumentNode;
 
-        web.UseCookies = true;
-        web.PreRequest += request =>
-        {
-            var cookieContainer = new CookieContainer();
-            cookieContainer.Add(new Cookie("birthtime", "312850801") { Domain = new Uri(url).Host });
-            request.CookieContainer = cookieContainer;
-            return true;
-        };
 
         return doc.DocumentNode;
     }
