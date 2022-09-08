@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,6 +18,8 @@ using System.Windows.Shapes;
 using ApriSiSteam.BL;
 using ApriSiSteam.BL.Repositories;
 using ApriSiSteam.WPF.UserControls;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ApriSiSteam.WPF.Pages
 {
@@ -26,7 +29,7 @@ namespace ApriSiSteam.WPF.Pages
     public partial class MainPage : Page
     {
         private GamePage gamePage = new GamePage();
-        private List<string> tagStrings;
+        private List<string?> tagStrings = new();
 
         public MainPage()
         {
@@ -59,6 +62,7 @@ namespace ApriSiSteam.WPF.Pages
             foreach (var checkBox in tags.Select(tag => new CheckBox()
                      {
                          Content = tag,
+                         DataContext = tag,
                          Foreground = Brushes.White
                      }))
             {
@@ -71,7 +75,7 @@ namespace ApriSiSteam.WPF.Pages
         private void CheckBoxOnUnchecked(object sender, RoutedEventArgs e)
         {
             var checkerBox = sender as CheckBox;
-            tagStrings.Remove(checkerBox!.Content.ToString()!);
+            tagStrings.Remove(checkerBox!.DataContext.ToString());
             var searchThread = new Thread(() =>
             {
                 Dispatcher.Invoke(() =>
@@ -80,12 +84,13 @@ namespace ApriSiSteam.WPF.Pages
                 });
             });
             searchThread.Start();
+            Debug.WriteLine(tagStrings.Count);
         }
 
         private void CheckBoxOnChecked(object sender, RoutedEventArgs e)
         {
             if(sender is CheckBox checkBox)
-                tagStrings.Add((string)checkBox.Content);
+                tagStrings.Add(checkBox.DataContext.ToString());
 
             var searchThread = new Thread(() =>
             {
@@ -95,24 +100,39 @@ namespace ApriSiSteam.WPF.Pages
                 });
             });
             searchThread.Start();
+            Debug.WriteLine(tagStrings.Count);
         }
 
         public void SortGamesControls(ItemsControl itemsControl)
         {
             foreach (var item in itemsControl.Items)
             {
-
-                if (item is GameControl control)
+                var hasCategories = true;
+                if (item is GameControl control && tagStrings.Count > 0)
                 {
-                    if (!control!.GameNameText.Text.ToLower().Contains(GamesSearchBox.Text.ToLower())) {
-                        control.Visibility = Visibility.Hidden;
-                        control.Height = 0;
-                    }else
+                    var gameTags = new List<string>();
+                    if (control.Category.ToString() != "[]")
                     {
-                        control.Visibility = Visibility.Visible;
-                        control.Height = 20;
-                    }
+                        foreach (var tag in (control.Category as JObject)!)
+                            gameTags.Add(tag.Key);
 
+                        hasCategories = tagStrings.Except(gameTags).ToList().Count <= 0;
+
+                    }
+                    else
+                    {
+                        hasCategories = false;
+                    }
+                }
+
+                if (item is not GameControl gameControl) continue;
+                if (!gameControl!.GameNameText.Text.ToLower().Contains(GamesSearchBox.Text.ToLower()) || !hasCategories) {
+                    gameControl.Visibility = Visibility.Hidden;
+                    gameControl.Height = 0;
+                }else
+                {
+                    gameControl.Visibility = Visibility.Visible;
+                    gameControl.Height = 20;
                 }
             }
         }
@@ -122,7 +142,6 @@ namespace ApriSiSteam.WPF.Pages
             foreach (var item in GamesItemControl.Items)
             {
                 var gameItem = item as GameControl;
-
                 gameItem!.SetData();
             }
         }
