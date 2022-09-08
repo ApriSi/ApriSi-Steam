@@ -1,10 +1,15 @@
 ﻿using System.Data.SqlTypes;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Json;
 using System.Web;
 using System.Xml;
 using ApriSiSteam.BL.Models;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Steamworks;
+using Steamworks.Ugc;
 
 namespace ApriSiSteam.BL.Repositories;
 
@@ -13,45 +18,28 @@ public class SteamAppRepository
     public static int CurrentLoadedGames;
     public static int GamesToLoad;
 
-    private static List<SteamApp> GetOwnedGames(string steamId, bool isFriend = false)
+    private static List<SteamApp> GetOwnedGames(string steamId)
     {
         CurrentLoadedGames = 0;
-        var steamApps = new List<SteamApp>();
+        var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/");
+        var games = htmlNode.SelectNodes("//tr[@class='app']");
+        
+        var apps = new List<SteamApp>();
+        GamesToLoad = games.Count;
 
-        var xmlDocument = new XmlDocument();
-        xmlDocument.Load($"https://steamcommunity.com/profiles/{steamId}/games?xml=1");
-        var apps = xmlDocument.GetElementsByTagName("game");
-
-        GamesToLoad = apps.Count;
-        foreach (XmlNode app in apps)
+        if (!File.Exists("ClientGames.json"))
         {
-            var appId = app["appID"]!.InnerText;
-
-
-            var steamApp = new SteamApp()
+            foreach (var game in games)
             {
-                Appid = appId,
-            };
+                WebClient webClient = new WebClient();
+                var json = webClient.DownloadString($"https://steamspy.com/api.php?request=appdetails&appid={game.Attributes["data-appid"].Value}");
 
-            if (!isFriend)
-            {
-                steamApp.Name = app["name"]!.InnerText;
-                steamApp.Image = $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg";
-            
-                var responseApps = Scraper.Scrape($"https://store.steampowered.com/app/{appId}", steam: true);
-                var tags = responseApps.SelectNodes(
-                    "//a[@class='game_area_details_specs_ctn']//div[@class='label']");
-
-                if(tags is not null)
-                    foreach (var tag in tags)
-                        steamApp.Categories.Add(tag.InnerText);
+                apps.Add(JsonConvert.DeserializeObject<SteamApp>(json)!);
+                CurrentLoadedGames++;
             }
-
-            CurrentLoadedGames++;
-            steamApps.Add(steamApp);
         }
-
-        return steamApps;
+        
+        return apps;
     }
 
     public static void CreateOwnedGamesJson(string steamId)
@@ -68,13 +56,46 @@ public class SteamAppRepository
 
         return steamApps;
     }
-    
-    public static List<string> GetTags()
+
+    public static void CreateFriendGamesJson()
     {
-        var responseTags = Scraper.Scrape("https://store.steampowered.com/search/");
-        var steamTags = responseTags.SelectNodes("//div[@class='tab_filter_control_row ']");
-        var sortedTags = steamTags.OrderBy(o => o.Attributes["data-loc"].Value).ToList();
-        
-        return sortedTags.Select(tag => tag.Attributes["data-loc"].Value).ToList();
+        if (File.Exists("FriendGames.json")) return;
+        var friendGames = new Dictionary<string, List<string>>();
+        var friends = Steam.GetFriends();
+
+        foreach (var friend in friends)
+        {
+            friendGames.Add(friend.SteamId, new List<string>());
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load($"https://steamcommunity.com/profiles/{friend.SteamId}/games?xml=1");
+            var apps = xmlDocument.GetElementsByTagName("game");
+
+            GamesToLoad = apps.Count;
+            foreach (XmlNode app in apps)
+            {
+                var appId = app["appID"]!.InnerText;
+                friendGames[friend.SteamId].Add(appId);
+            }
+        }
+
+        File.WriteAllText(@"FriendGames.json", JsonConvert.SerializeObject(friendGames));
+    }
+    
+    public static IEnumerable<string> GetTags()
+    {
+        var ownedGames = ReadOwnedGames();
+
+        var tags = new List<string>();
+        foreach (var app in ownedGames)
+        {
+            if (app.tags!.ToString() == "[]") continue;
+
+            foreach (var tag in (app.tags as JObject)!)
+                if (!tags.Contains(tag.Key))
+                    tags.Add(tag.Key);
+        }
+
+        return tags; 
     }
 }

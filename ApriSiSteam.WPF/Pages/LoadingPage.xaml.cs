@@ -36,15 +36,27 @@ namespace ApriSiSteam.WPF.Pages
         public async void Loading()
         {
             var creatingThread =
-                new Thread(() => { SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId()); });
+                new Thread(() =>
+                {
+                    SteamAppRepository.CreateOwnedGamesJson(Steam.GetClientSteamId());
+                    SteamAppRepository.CreateFriendGamesJson();
+                });
             creatingThread.Start();
 
             while (!File.Exists("ClientGames.json"))
             {
-                Debug.WriteLine("a");
                 Dispatcher.Invoke(() =>
                 {
                     LoadingDisplay.Text = $"{SteamAppRepository.CurrentLoadedGames}/{SteamAppRepository.GamesToLoad}";
+                });
+                Thread.Sleep(100);
+            }
+
+            while (!File.Exists("FriendGames.json"))
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    LoadingDisplay.Text = $"from your friends";
                 });
                 Thread.Sleep(100);
             }

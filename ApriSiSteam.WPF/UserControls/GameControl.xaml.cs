@@ -25,11 +25,13 @@ namespace ApriSiSteam.WPF.UserControls
         public string GameName;
         public string Image;
         public string GameID;
-        public GameControl(string gameName, string imageUrl, string gameId)
+        public object Category;
+        public GameControl(string gameName, string imageUrl, string gameId, object category)
         {
             GameName = gameName;
             Image = imageUrl;
             GameID = gameId;
+            Category = category;
 
             InitializeComponent();
 

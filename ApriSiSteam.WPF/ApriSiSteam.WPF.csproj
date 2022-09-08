@@ -5,7 +5,12 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <AssemblyName>ApriSiSteam</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Images\ApriSiLogo.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ApriSiSteam.BL\ApriSiSteam.BL.csproj" />
