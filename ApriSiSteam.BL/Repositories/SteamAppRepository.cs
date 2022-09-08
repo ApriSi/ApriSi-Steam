@@ -7,6 +7,8 @@ using System.Xml;
 using ApriSiSteam.BL.Models;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Steamworks.Ugc;
 
 namespace ApriSiSteam.BL.Repositories;
 
@@ -68,12 +70,20 @@ public class SteamAppRepository
         return steamApps;
     }
     
-    public static List<string> GetTags()
+    public static IEnumerable<string> GetTags()
     {
-        var responseTags = Scraper.Scrape("https://store.steampowered.com/search/");
-        var steamTags = responseTags.SelectNodes("//div[@class='tab_filter_control_row ']");
-        var sortedTags = steamTags.OrderBy(o => o.Attributes["data-loc"].Value).ToList();
-        
-        return sortedTags.Select(tag => tag.Attributes["data-loc"].Value).ToList();
+        var ownedGames = ReadOwnedGames();
+
+        var tags = new List<string>();
+        foreach (var app in ownedGames)
+        {
+            if (app.tags!.ToString() == "[]") continue;
+
+            foreach (var tag in (app.tags as JObject)!)
+                if (!tags.Contains(tag.Key))
+                    tags.Add(tag.Key);
+        }
+
+        return tags; 
     }
 }
