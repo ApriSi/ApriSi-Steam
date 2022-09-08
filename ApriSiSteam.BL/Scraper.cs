@@ -11,6 +11,8 @@ public static class Scraper
     public static HtmlNode Scrape(string url, bool steam = false, bool loadHtmlString = false)
     {
         var web = new HtmlWeb();
+        web.UserAgent = web.Load($"https://www.whatismybrowser.com/guides/the-latest-user-agent/chrome").DocumentNode.SelectNodes("//span[@class='code']").First().InnerHtml;
+
         var doc = web.Load(new Uri(url));
 
         if(loadHtmlString)

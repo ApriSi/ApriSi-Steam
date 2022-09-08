@@ -36,6 +36,9 @@
     <Page Update="Pages\MainPage.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="StyleXaml\CheckBox.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="StyleXaml\Scrollbar.xaml">
       <SubType>Designer</SubType>
     </Page>

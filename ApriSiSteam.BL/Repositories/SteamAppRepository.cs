@@ -1,9 +1,11 @@
 ﻿using System.Data.SqlTypes;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http.Json;
 using System.Web;
 using System.Xml;
 using ApriSiSteam.BL.Models;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 
 namespace ApriSiSteam.BL.Repositories;
@@ -18,40 +20,37 @@ public class SteamAppRepository
         CurrentLoadedGames = 0;
         var steamApps = new List<SteamApp>();
 
-        var xmlDocument = new XmlDocument();
-        xmlDocument.Load($"https://steamcommunity.com/profiles/{steamId}/games?xml=1");
-        var apps = xmlDocument.GetElementsByTagName("game");
 
-        GamesToLoad = apps.Count;
-        foreach (XmlNode app in apps)
+        var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/", false);
+
+        var games = htmlNode.SelectNodes("//tr[@class='app']");
+
+
+
+        GamesToLoad = games.Count;
+        foreach (HtmlNode app in games)
         {
-            var appId = app["appID"]!.InnerText;
+            var appId = app.Attributes["data-appid"].Value;
 
-
-            var steamApp = new SteamApp()
+            if (!File.Exists("ClientGames.json"))
             {
-                Appid = appId,
-            };
+                var apps = new List<SteamApp>();
+                foreach (var game in games)
+                {
+                    WebClient webClient = new WebClient();
+                    var json = webClient.DownloadString($"https://steamspy.com/api.php?request=appdetails&appid={game.Attributes["data-appid"].Value}");
 
-            if (!isFriend)
-            {
-                steamApp.Name = app["name"]!.InnerText;
-                steamApp.Image = $"https://cdn.akamai.steamstatic.com/steam/apps/{appId}/header.jpg";
-            
-                var responseApps = Scraper.Scrape($"https://store.steampowered.com/app/{appId}", steam: true);
-                var tags = responseApps.SelectNodes(
-                    "//a[@class='game_area_details_specs_ctn']//div[@class='label']");
-
-                if(tags is not null)
-                    foreach (var tag in tags)
-                        steamApp.Categories.Add(tag.InnerText);
+                    apps.Add(JsonConvert.DeserializeObject<SteamApp>(json)!);
+                    CurrentLoadedGames++;
+                }
+                File.WriteAllText(@"ClientGames.json", JsonConvert.SerializeObject(apps));
             }
 
-            CurrentLoadedGames++;
-            steamApps.Add(steamApp);
         }
 
-        return steamApps;
+        var clientGames = File.ReadAllText("ClientGames.json");
+
+        return JsonConvert.DeserializeObject<List<SteamApp>>(clientGames)!;
     }
 
     public static void CreateOwnedGamesJson(string steamId)

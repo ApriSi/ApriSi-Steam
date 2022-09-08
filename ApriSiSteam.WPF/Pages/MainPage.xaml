@@ -10,7 +10,8 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/StyleXaml/Scrollbar.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="/StyleXaml/Scrollbar.xaml"/>
+                <ResourceDictionary Source="/StyleXaml/CheckBox.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -37,9 +38,11 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
+                            <RowDefinition Height="25"/>
                             <RowDefinition/>
                             <RowDefinition Height="10"/>
-                            <RowDefinition Height="125"/>
+                            <RowDefinition Height="25"/>
+                            <RowDefinition Height="100"/>
                         </Grid.RowDefinitions>
 
                         <TextBlock x:Name="GamesCountTextBlock" FontWeight="SemiBold" Foreground="White">Games: 500</TextBlock>
@@ -51,7 +54,20 @@
                                 Margin="0,2,0,2"
 
                                 Padding="0,-3,0,0" Click="RefreshGamesButton_Click">↻</Button>
-                        <ItemsControl Grid.Row="1" x:Name="GamesItemControl" ItemsSource="{Binding GameControl}"
+                        <Grid Grid.Row="1" Margin="0, 4" Background="#292929">
+                            <TextBlock x:Name="SearchboxSearchText" 
+                                       Grid.Row="1" 
+                                       Foreground="White"
+                                       VerticalAlignment="Center" Margin="4,0">Search</TextBlock>
+                            <TextBox x:Name="GamesSearchBox"
+                                     Foreground="White"
+                                     CaretBrush="White"
+                                     BorderThickness="0" TextChanged="GamesSearchBox_OnTextChanged"
+                                     Background="Transparent">
+                            </TextBox>
+                        </Grid>
+
+                        <ItemsControl Grid.Row="2" x:Name="GamesItemControl" ItemsSource="{Binding GameControl}"
                                       Loaded="OnGamesLoaded">
                             <ItemsControl.ItemContainerStyle>
                                 <Style TargetType="UserControl">
@@ -71,8 +87,20 @@
                                 </ControlTemplate>
                             </ItemsControl.Template>
                         </ItemsControl>
+                        <Grid Grid.Row="4" Margin="0, 4" Background="#292929">
+                            <TextBlock x:Name="TagBoxSearchText" 
+                                       Grid.Row="1" 
+                                       Foreground="White"
+                                       VerticalAlignment="Center" Margin="4,0">Search</TextBlock>
+                            <TextBox x:Name="TagsSearchBox"
+                                     Foreground="White"
+                                     CaretBrush="White"
+                                     BorderThickness="0" TextChanged="TagsSearchBox_OnTextChanged"
+                                     Background="Transparent">
+                            </TextBox>
+                        </Grid>
 
-                        <ItemsControl Grid.Row="3" x:Name="SteamTagsList"
+                        <ItemsControl Grid.Row="5" x:Name="SteamTagsList"
                                       Loaded="OnSteamTagsLoaded">
                             <ItemsControl.Template>
                                 <ControlTemplate>
