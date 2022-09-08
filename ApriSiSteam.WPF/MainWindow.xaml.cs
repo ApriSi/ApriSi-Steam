@@ -49,19 +49,34 @@ namespace ApriSiSteam.WPF
 
         private void UserInformationLoaded(object sender, RoutedEventArgs e)
         {
-            var steamClient = SteamClientRepository.GetSteamClientInformation();
-            UserNameTextBlock.Text = Steam.GetClientName();
-            UserLevelTextBlock.Text = "Level: " + steamClient.Level;
-            UserImage.Source = new BitmapImage(new Uri(steamClient.Avatar!));
-
-            if (steamClient.AvatarFrame is not null)
-                UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!));
-
-            foreach (var friend in SteamFriendRepository.GetFriends())
+            var loaduser = new Thread(() =>
             {
-                var friendControl = new FriendControl(friend.Name!, friend.Avatar!, friend.SteamId!);
-                FriendList.Items.Add(friendControl);
-            }
+                var steamClient = SteamClientRepository.GetSteamClientInformation();
+                Dispatcher.Invoke(() =>
+                {
+                    UserNameTextBlock.Text = Steam.GetClientName();
+                    UserLevelTextBlock.Text = "Level: " + steamClient.Level;
+                    UserImage.Source = new BitmapImage(new Uri(steamClient.Avatar!));
+
+                    if (steamClient.AvatarFrame is not null)
+                        UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!));
+                });
+            });
+
+            var loadFriends = new Thread(() =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    foreach (var friend in SteamFriendRepository.GetFriends())
+                    {
+                        var friendControl = new FriendControl(friend.Name!, friend.Avatar!, friend.SteamId!);
+                        FriendList.Items.Add(friendControl);
+                    }
+                });
+            });
+
+            loaduser.Start();
+            loadFriends.Start();
         }
 
         public void SetPage(Page page)
