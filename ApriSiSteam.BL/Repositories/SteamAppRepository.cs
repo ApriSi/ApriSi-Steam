@@ -8,6 +8,7 @@ using ApriSiSteam.BL.Models;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Steamworks;
 using Steamworks.Ugc;
 
 namespace ApriSiSteam.BL.Repositories;
@@ -17,42 +18,28 @@ public class SteamAppRepository
     public static int CurrentLoadedGames;
     public static int GamesToLoad;
 
-    private static List<SteamApp> GetOwnedGames(string steamId, bool isFriend = false)
+    private static List<SteamApp> GetOwnedGames(string steamId)
     {
         CurrentLoadedGames = 0;
-        var steamApps = new List<SteamApp>();
-
-
-        var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/", false);
-
+        var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/");
         var games = htmlNode.SelectNodes("//tr[@class='app']");
-
-
-
+        
+        var apps = new List<SteamApp>();
         GamesToLoad = games.Count;
-        foreach (HtmlNode app in games)
+
+        if (!File.Exists("ClientGames.json"))
         {
-            var appId = app.Attributes["data-appid"].Value;
-
-            if (!File.Exists("ClientGames.json"))
+            foreach (var game in games)
             {
-                var apps = new List<SteamApp>();
-                foreach (var game in games)
-                {
-                    WebClient webClient = new WebClient();
-                    var json = webClient.DownloadString($"https://steamspy.com/api.php?request=appdetails&appid={game.Attributes["data-appid"].Value}");
+                WebClient webClient = new WebClient();
+                var json = webClient.DownloadString($"https://steamspy.com/api.php?request=appdetails&appid={game.Attributes["data-appid"].Value}");
 
-                    apps.Add(JsonConvert.DeserializeObject<SteamApp>(json)!);
-                    CurrentLoadedGames++;
-                }
-                File.WriteAllText(@"ClientGames.json", JsonConvert.SerializeObject(apps));
+                apps.Add(JsonConvert.DeserializeObject<SteamApp>(json)!);
+                CurrentLoadedGames++;
             }
-
         }
-
-        var clientGames = File.ReadAllText("ClientGames.json");
-
-        return JsonConvert.DeserializeObject<List<SteamApp>>(clientGames)!;
+        
+        return apps;
     }
 
     public static void CreateOwnedGamesJson(string steamId)
@@ -68,6 +55,25 @@ public class SteamAppRepository
         var steamApps = JsonConvert.DeserializeObject<List<SteamApp>>(clientGames);
 
         return steamApps;
+    }
+
+    public static void CreateFriendGamesJson()
+    {
+        if (File.Exists("FriendGames.json")) return;
+        var friendGames = new Dictionary<string, List<string>>();
+        var friends = Steam.GetFriends();
+
+        foreach (var friend in friends)
+        {
+            var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{friend.SteamId}/");
+            var games = htmlNode.SelectNodes("//tr[@class='app']");
+            
+            friendGames.Add(friend.SteamId, new List<string>());
+            foreach (var game in games)
+                friendGames[friend.SteamId].Add(game.Attributes["data-appid"].Value);
+        }
+
+        File.WriteAllText(@"FriendGames.json", JsonConvert.SerializeObject(friendGames));
     }
     
     public static IEnumerable<string> GetTags()
