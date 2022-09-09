@@ -78,10 +78,7 @@ namespace ApriSiSteam.WPF.Pages
             tagStrings.Remove(checkerBox!.DataContext.ToString());
             var searchThread = new Thread(() =>
             {
-                Dispatcher.Invoke(() =>
-                {
-                    SortGamesControls(GamesItemControl);
-                });
+                Dispatcher.Invoke(SortGamesControls);
             });
             searchThread.Start();
             Debug.WriteLine(tagStrings.Count);
@@ -94,18 +91,30 @@ namespace ApriSiSteam.WPF.Pages
 
             var searchThread = new Thread(() =>
             {
-                Dispatcher.Invoke(() =>
-                {
-                    SortGamesControls(GamesItemControl);
-                });
+                Dispatcher.Invoke(SortGamesControls);
             });
             searchThread.Start();
             Debug.WriteLine(tagStrings.Count);
         }
 
-        public void SortGamesControls(ItemsControl itemsControl)
+        public void SortGamesControls()
         {
-            foreach (var item in itemsControl.Items)
+            var mainWindow = Application.Current.MainWindow as MainWindow;
+            if (mainWindow!.FriendImageList.Items.Count >= 0)
+            {
+                foreach (var selectedFriend in mainWindow!.FriendImageList.Items)
+                {
+                    var friend = selectedFriend as Image;
+                    var games = SteamFriendRepository.GetFriendGames(friend!.DataContext.ToString());
+
+                    foreach (var game in games)
+                    {
+                        
+                    }
+                }
+            }
+
+            foreach (var item in GamesItemControl.Items)
             {
                 var hasCategories = true;
                 if (item is GameControl control && tagStrings.Count > 0)
@@ -117,7 +126,6 @@ namespace ApriSiSteam.WPF.Pages
                             gameTags.Add(tag.Key);
 
                         hasCategories = tagStrings.Except(gameTags).ToList().Count <= 0;
-
                     }
                     else
                     {
@@ -154,10 +162,7 @@ namespace ApriSiSteam.WPF.Pages
 
             var searchThread = new Thread(() =>
             {
-                Dispatcher.Invoke(() =>
-                {
-                    SortGamesControls(GamesItemControl);
-                });
+                Dispatcher.Invoke(SortGamesControls);
             });
             searchThread.Start();
         }

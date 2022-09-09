@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ApriSiSteam.BL;
+using ApriSiSteam.BL.Repositories;
 
 namespace ApriSiSteam.WPF.Pages
 {

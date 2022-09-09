@@ -89,11 +89,21 @@ namespace ApriSiSteam.WPF
         {
             var friendControl = sender as FriendControl;
 
+            if (FriendImageList.Items.Cast<Image>().Any(friend => friend.DataContext.ToString() == friendControl!.SteamId))
+                return;
+
             var friendImage = new Image()
             {
                 Source = friendControl!.ImageDisplay.Source,
                 DataContext = friendControl.SteamId
             };
+
+            friendImage.MouseDown += (o, args) => FriendImageList.Items.Remove(o);
+
+            var mainPage = PageFrame.Content as MainPage;
+            mainPage!.SortGamesControls();
+            
+
             FriendImageList.Items.Add(friendImage);
         }
     }
