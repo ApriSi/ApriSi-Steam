@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ApriSiSteam.WPF.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="20" d:DesignWidth="150">
-    <Grid>
+    <Grid x:Name="FriendGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
             <ColumnDefinition/>
@@ -14,6 +14,7 @@
         
         <Image x:Name="ImageDisplay"
                Source="https://avatars.cloudflare.steamstatic.com/3da502bfc03b9f9d54c29467309e5229dcbf2b27_full.jpg"/>
+    
         <TextBlock x:Name="NameDisplay"
                    Grid.Column="1"
                    Text="BAUHAUS"

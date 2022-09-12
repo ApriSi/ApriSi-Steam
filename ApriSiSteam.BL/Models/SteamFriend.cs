@@ -5,5 +5,6 @@
         public string? SteamId { get; set; }
         public string? Name { get; set; }
         public string? Avatar { get; set; }
+        public bool IsPrivate { get; set; }
     }
 }

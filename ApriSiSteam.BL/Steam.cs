@@ -35,5 +35,5 @@ public static class Steam
         }
 
         return friends;
-    }
+    }  
 }
