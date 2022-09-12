@@ -100,11 +100,10 @@ namespace ApriSiSteam.WPF
 
             friendImage.MouseDown += RemoveFriendMouseDown;
 
+            FriendImageList.Items.Add(friendImage);
+
             var mainPage = PageFrame.Content as MainPage;
             mainPage!.SortGamesControls();
-            
-
-            FriendImageList.Items.Add(friendImage);
         }
         private void RemoveFriendMouseDown(object sender, MouseButtonEventArgs e)
         {
