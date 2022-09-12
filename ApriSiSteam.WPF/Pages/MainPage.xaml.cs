@@ -97,23 +97,47 @@ namespace ApriSiSteam.WPF.Pages
             Debug.WriteLine(tagStrings.Count);
         }
 
-        public void SortGamesControls()
+        private static List<string> GetSortedFriendGames()
         {
+            // Confusion
             var mainWindow = Application.Current.MainWindow as MainWindow;
-            if (mainWindow!.FriendImageList.Items.Count >= 0)
+            if (mainWindow!.FriendImageList.Items.Count < 0) return new List<string>();
+            
+            var friendsAppIds = new List<string>();
+            var sortedGames = new List<string>();
+            foreach (var selectedFriend in mainWindow!.FriendImageList.Items)
             {
-                foreach (var selectedFriend in mainWindow!.FriendImageList.Items)
-                {
-                    var friend = selectedFriend as Image;
-                    var games = SteamFriendRepository.GetFriendGames(friend!.DataContext.ToString());
+                var friend = selectedFriend as Image;
+                var games = SteamFriendRepository.GetFriendGames(friend!.DataContext.ToString());
 
-                    foreach (var game in games)
-                    {
-                        
-                    }
+                foreach (var appid in games)
+                {
+                    if(!friendsAppIds.Contains(appid))
+                        friendsAppIds.Add(appid);
+
+                    if (!sortedGames.Contains(appid))
+                        sortedGames.Add(appid);
                 }
             }
 
+            foreach (var selectedFriend in mainWindow!.FriendImageList.Items)
+            {
+                var friend = selectedFriend as Image;
+                var games = SteamFriendRepository.GetFriendGames(friend!.DataContext.ToString());
+
+                foreach (var appid in sortedGames)
+                {
+                    if(!games.Contains(appid))
+                        friendsAppIds.Remove(appid);
+                }
+            }
+
+            return friendsAppIds;
+        }
+
+        public void SortGamesControls()
+        {
+            var friendAppIds = GetSortedFriendGames();
             foreach (var item in GamesItemControl.Items)
             {
                 var hasCategories = true;
@@ -134,7 +158,7 @@ namespace ApriSiSteam.WPF.Pages
                 }
 
                 if (item is not GameControl gameControl) continue;
-                if (!gameControl!.GameNameText.Text.ToLower().Contains(GamesSearchBox.Text.ToLower()) || !hasCategories) {
+                if (!gameControl!.GameNameText.Text.ToLower().Contains(GamesSearchBox.Text.ToLower()) || !hasCategories || !friendAppIds.Contains(gameControl.GameID)) {
                     gameControl.Visibility = Visibility.Hidden;
                     gameControl.Height = 0;
                 }else

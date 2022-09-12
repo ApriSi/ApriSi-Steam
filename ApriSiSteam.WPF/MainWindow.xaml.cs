@@ -98,13 +98,19 @@ namespace ApriSiSteam.WPF
                 DataContext = friendControl.SteamId
             };
 
-            friendImage.MouseDown += (o, args) => FriendImageList.Items.Remove(o);
+            friendImage.MouseDown += RemoveFriendMouseDown;
 
             var mainPage = PageFrame.Content as MainPage;
             mainPage!.SortGamesControls();
             
 
             FriendImageList.Items.Add(friendImage);
+        }
+        private void RemoveFriendMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            FriendImageList.Items.Remove(sender);
+            var mainPage = PageFrame.Content as MainPage;
+            mainPage!.SortGamesControls();
         }
     }
 }
