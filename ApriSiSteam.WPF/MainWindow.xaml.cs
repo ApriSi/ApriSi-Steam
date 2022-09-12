@@ -28,6 +28,15 @@ namespace ApriSiSteam.WPF
         {
             InitializeComponent();
             Steam.RunSteam();
+
+            var steamClient = SteamClientRepository.GetSteamClientInformation();
+
+                UserNameTextBlock.Text = Steam.GetClientName();
+                UserLevelTextBlock.Text = "Level: " + steamClient.Level;
+                UserImage.Source = new BitmapImage(new Uri(steamClient.Avatar!));
+
+            if (steamClient.AvatarFrame is not null)
+                Dispatcher.Invoke(() => UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!)));
         }
 
         private void OnVersionDisplayLoaded(object sender, RoutedEventArgs e) =>
@@ -47,9 +56,9 @@ namespace ApriSiSteam.WPF
         private void MaximizeButtonClick(object sender, RoutedEventArgs e) => WindowState =
             WindowState != WindowState.Normal ? WindowState.Normal : WindowState.Maximized;
 
-        private void UserInformationLoaded(object sender, RoutedEventArgs e)
+        private async void UserInformationLoaded(object sender, RoutedEventArgs e)
         {
-            var loaduser = new Thread(() =>
+            var friendsThread = new Thread(() =>
             {
                 var steamClient = SteamClientRepository.GetSteamClientInformation();
                 Dispatcher.Invoke(() =>
@@ -57,26 +66,32 @@ namespace ApriSiSteam.WPF
                     UserNameTextBlock.Text = Steam.GetClientName();
                     UserLevelTextBlock.Text = "Level: " + steamClient.Level;
                     UserImage.Source = new BitmapImage(new Uri(steamClient.Avatar!));
-
-                    if (steamClient.AvatarFrame is not null)
-                        UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!));
                 });
-            });
 
-            var loadFriends = new Thread(() =>
-            {
-                Dispatcher.Invoke(() =>
+                if (steamClient.AvatarFrame is not null)
+                  Dispatcher.Invoke(() =>  UserImageFrame.Source = new BitmapImage(new Uri(steamClient.AvatarFrame!)));
+
+                foreach (var friend in SteamFriendRepository.GetFriends())
                 {
-                    foreach (var friend in SteamFriendRepository.GetFriends())
-                    {
+                    Dispatcher.Invoke(() => { 
                         var friendControl = new FriendControl(friend.Name!, friend.Avatar!, friend.SteamId!);
                         FriendList.Items.Add(friendControl);
-                    }
-                });
+                    });
+                }
+
+                while (!File.Exists("FriendGames.json"))
+                {
+                    Thread.Sleep(20);
+                }
+
+                foreach (var item in FriendList.Items)
+                {
+                    var control = item as FriendControl;
+                    Dispatcher.Invoke(() => control!.SetData());
+                }
             });
 
-            loaduser.Start();
-            loadFriends.Start();
+            friendsThread.Start();
         }
 
         public void SetPage(Page page)

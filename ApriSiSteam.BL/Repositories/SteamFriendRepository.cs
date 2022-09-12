@@ -10,7 +10,7 @@ public class SteamFriendRepository
     public static List<SteamFriend> GetFriends()
     {
         var steamFriends = Steam.GetFriends();
-        return steamFriends.Select(steamFriend => new SteamFriend() { SteamId = steamFriend.SteamId!.ToString(), Name = steamFriend.Name, Avatar = steamFriend.Avatar }).ToList();
+        return steamFriends.Select(steamFriend => new SteamFriend() { SteamId = steamFriend.SteamId!.ToString(), Name = steamFriend.Name, Avatar = steamFriend.Avatar}).ToList();
     }
 
     public static List<string> GetFriendGames(string? steamId)

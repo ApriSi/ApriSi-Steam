@@ -2,5 +2,5 @@
 
 public class AppInformation
 {
-    public const string VERSION = "1.3.1-Beta";
+    public const string VERSION = "1.4-Beta";
 }

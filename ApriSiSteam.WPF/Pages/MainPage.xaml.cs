@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using ApriSiSteam.BL;
 using ApriSiSteam.BL.Repositories;
 using ApriSiSteam.WPF.UserControls;
@@ -47,12 +48,22 @@ namespace ApriSiSteam.WPF.Pages
 
         private void OnGamesLoaded(object sender, RoutedEventArgs e)
         {
-            var games = SteamAppRepository.ReadOwnedGames();
-            foreach (var gameControl in games)
+            var loadGames = new Thread(() =>
             {
-                var game = new GameControl(gameControl.name!, $"https://cdn.cloudflare.steamstatic.com/steam/apps/{gameControl.appid}/header.jpg", gameControl.appid.ToString(), gameControl.tags!);
-                GamesItemControl.Items.Add(game);
-            }
+                var games = SteamAppRepository.ReadOwnedGames();
+                var sortedGames = games!.OrderBy(o => o.name).ToList();
+
+                foreach (var gameControl in sortedGames)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        var game = new GameControl(gameControl.name!, $"https://cdn.cloudflare.steamstatic.com/steam/apps/{gameControl.appid}/header.jpg", gameControl.appid.ToString(), gameControl.tags!);
+                        GamesItemControl.Items.Add(game);
+                    });
+                }
+
+            });
+            loadGames.Start();
         }
 
         private void OnSteamTagsLoaded(object sender, RoutedEventArgs e)
@@ -78,7 +89,7 @@ namespace ApriSiSteam.WPF.Pages
             tagStrings.Remove(checkerBox!.DataContext.ToString());
             var searchThread = new Thread(() =>
             {
-                Dispatcher.Invoke(SortGamesControls);
+                SortGamesControls();
             });
             searchThread.Start();
             Debug.WriteLine(tagStrings.Count);
@@ -91,7 +102,7 @@ namespace ApriSiSteam.WPF.Pages
 
             var searchThread = new Thread(() =>
             {
-                Dispatcher.Invoke(SortGamesControls);
+                SortGamesControls();
             });
             searchThread.Start();
             Debug.WriteLine(tagStrings.Count);
@@ -106,13 +117,17 @@ namespace ApriSiSteam.WPF.Pages
             foreach (var selectedFriend in mainWindow!.FriendImageList.Items)
             {
                 var friend = selectedFriend as Image;
+
                 var games = SteamFriendRepository.GetFriendGames(friend!.DataContext.ToString());
+                var currentList = new List<string>();
 
-                var exceptionTags = friendsAppIds.Except(games).ToList();
-                foreach (var tag in exceptionTags)
-                    games.Remove(tag);
+                foreach (var appId in games)
+                {
+                    if (friendsAppIds.Contains(appId) || friendsAppIds.Count <= 0)
+                        currentList.Add(appId);
+                }
 
-                friendsAppIds = games; 
+                friendsAppIds = currentList; 
             }
 
             return friendsAppIds;
@@ -120,37 +135,47 @@ namespace ApriSiSteam.WPF.Pages
 
         public void SortGamesControls()
         {
-            var friendAppIds = GetSortedFriendGames();
-            Debug.WriteLine(friendAppIds.Count);
-            foreach (var item in GamesItemControl.Items)
+            Dispatcher.Invoke(() =>
             {
-                var hasCategories = true;
-                if (item is GameControl control && tagStrings.Count > 0)
+                var friendAppIds = GetSortedFriendGames();
+                foreach (var item in GamesItemControl.Items)
                 {
-                    var gameTags = new List<string>();
-                    if (control.Category.ToString() != "[]")
+                    var hasCategories = true;
+                    if (item is GameControl control && tagStrings.Count > 0)
                     {
-                        foreach (var tag in (control.Category as JObject)!)
-                            gameTags.Add(tag.Key);
+                        var gameTags = new List<string>();
+                        if (control.Category.ToString() != "[]")
+                        {
+                            foreach (var tag in (control.Category as JObject)!)
+                                gameTags.Add(tag.Key);
 
-                        hasCategories = tagStrings.Except(gameTags).ToList().Count <= 0;
+                            hasCategories = tagStrings.Except(gameTags).ToList().Count <= 0;
+                        }
+                        else
+                        {
+                            hasCategories = false;
+                        }
+                    }
+
+                    if (item is not GameControl gameControl) continue;
+                    if (!gameControl!.GameNameText.Text.ToLower().Contains(GamesSearchBox.Text.ToLower()) || !hasCategories || (!friendAppIds.Contains(gameControl.GameID) && friendAppIds.Count > 0))
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            gameControl.Visibility = Visibility.Hidden;
+                            gameControl.Height = 0;
+                        });
                     }
                     else
                     {
-                        hasCategories = false;
+                        Dispatcher.Invoke(() =>
+                        {
+                            gameControl.Visibility = Visibility.Visible;
+                            gameControl.Height = 20;
+                        });
                     }
-                }
-
-                if (item is not GameControl gameControl) continue;
-                if (!gameControl!.GameNameText.Text.ToLower().Contains(GamesSearchBox.Text.ToLower()) || !hasCategories || (!friendAppIds.Contains(gameControl.GameID) && friendAppIds.Count > 0)) {
-                    gameControl.Visibility = Visibility.Hidden;
-                    gameControl.Height = 0;
-                }else
-                {
-                    gameControl.Visibility = Visibility.Visible;
-                    gameControl.Height = 20;
-                }
-            }
+                }       
+            });
         }
 
         private void RefreshGamesButton_Click(object sender, RoutedEventArgs e)
