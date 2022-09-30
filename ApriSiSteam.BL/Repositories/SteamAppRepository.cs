@@ -23,7 +23,7 @@ public class SteamAppRepository
         CurrentLoadedGames = 0;
         var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/?all_games");
         var games = htmlNode.SelectNodes("//tr[@class='app']");
-        
+
         var apps = new List<SteamApp>();
         GamesToLoad = games.Count;
 
@@ -38,7 +38,7 @@ public class SteamAppRepository
                 CurrentLoadedGames++;
             }
         }
-        
+
         return apps;
     }
 
@@ -65,23 +65,31 @@ public class SteamAppRepository
 
         foreach (var friend in friends)
         {
-            friendGames.Add(friend.SteamId, new List<string>());
-
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load($"https://steamcommunity.com/profiles/{friend.SteamId}/games?xml=1");
-            var apps = xmlDocument.GetElementsByTagName("game");
-
-            GamesToLoad = apps.Count;
-            foreach (XmlNode app in apps)
+            try
             {
-                var appId = app["appID"]!.InnerText;
-                friendGames[friend.SteamId].Add(appId);
+                friendGames.Add(friend.SteamId, new List<string>());
+
+                var xmlDocument = new XmlDocument();
+                xmlDocument.Load($"https://steamcommunity.com/profiles/{friend.SteamId}/games?xml=1");
+                var apps = xmlDocument.GetElementsByTagName("game");
+
+                GamesToLoad = apps.Count;
+                foreach (XmlNode app in apps)
+                {
+                    var appId = app["appID"]!.InnerText;
+                    friendGames[friend.SteamId].Add(appId);
+                }
+
+            }
+            catch
+            {
+
             }
         }
 
         File.WriteAllText(@"FriendGames.json", JsonConvert.SerializeObject(friendGames));
     }
-    
+
     public static IEnumerable<string> GetTags()
     {
         var ownedGames = ReadOwnedGames();
@@ -96,6 +104,6 @@ public class SteamAppRepository
                     tags.Add(tag.Key);
         }
 
-        return tags; 
+        return tags;
     }
 }

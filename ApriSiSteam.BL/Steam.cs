@@ -21,19 +21,27 @@ public static class Steam
 
         foreach (var steamFriend in SteamFriends.GetFriends())
         {
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load($"https://steamcommunity.com/profiles/{steamFriend.Id}?xml=1");
-            var image = xmlDocument.GetElementsByTagName("avatarFull")[0]!.InnerText;
-
-            var friend = new SteamFriend()
+            try
             {
-                Name = steamFriend.Name,
-                SteamId = steamFriend.Id.ToString(),
-                Avatar = image
-            };
-            friends.Add(friend);
+                var xmlDocument = new XmlDocument();
+                xmlDocument.Load($"https://steamcommunity.com/profiles/{steamFriend.Id}?xml=1");
+                var image = xmlDocument.GetElementsByTagName("avatarFull")[0]!.InnerText;
+
+                var friend = new SteamFriend()
+                {
+                    Name = steamFriend.Name,
+                    SteamId = steamFriend.Id.ToString(),
+                    Avatar = image
+                };
+                friends.Add(friend);
+
+            }
+            catch
+            {
+
+            }
         }
 
         return friends;
-    }  
+    }
 }
