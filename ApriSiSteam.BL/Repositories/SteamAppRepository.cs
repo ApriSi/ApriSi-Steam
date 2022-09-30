@@ -21,7 +21,7 @@ public class SteamAppRepository
     private static List<SteamApp> GetOwnedGames(string steamId)
     {
         CurrentLoadedGames = 0;
-        var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/");
+        var htmlNode = Scraper.Scrape($"https://steamdb.info/calculator/{steamId}/?all_games");
         var games = htmlNode.SelectNodes("//tr[@class='app']");
         
         var apps = new List<SteamApp>();
